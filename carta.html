@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La Carta · Casa Brasa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Caveat:wght@500;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+/* Layout: fondo con trazos de fuego, parrilla y humo; hero cálido; secciones con 3 estilos de carta intercambiables */
+:root{
+  --bg:#FFF4E6; --surface:#FFFFFF; --surface-2:#FCE6CC; --ink:#3A1F14; --muted:#86584A;
+  --ember:#D9542B; --saffron:#E9A23B; --wine:#7A2131; --line:#F0D2B4; --ok:#2F7A4B;
+  --art-fire:#D9542B; --art-grill:#B9783F; --art-smoke:#86584A;
+  --shadow:0 10px 30px -12px rgba(122,33,49,.28);
+  /* constantes de los estilos (iguales en ambos temas) */
+  --board:#24221F; --chalk:#F2ECDF; --wood:#8A5A3B; --paper:#FFF7D9; --wine-deep:#5E1826; --cream:#FBEFE6;
+  --f-display:"Yeseva One", Georgia, "Times New Roman", serif;
+  --f-body:"Nunito", "Segoe UI", system-ui, sans-serif;
+  --f-hand:"Caveat", "Segoe Print", "Bradley Hand", cursive;
+  --r-sm:12px; --r:20px; --r-lg:28px; --fs:16px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1C120D; --surface:#2A1A13; --surface-2:#3A2318; --ink:#F7E6D4; --muted:#D3A98F;
+  --ember:#F07548; --saffron:#F2B457; --wine:#E58A97; --line:#4A2E21; --ok:#6CC08A;
+  --art-fire:#F07548; --art-grill:#C98A52; --art-smoke:#D3A98F;
+  --shadow:0 10px 30px -12px rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1C120D; --surface:#2A1A13; --surface-2:#3A2318; --ink:#F7E6D4; --muted:#D3A98F;
+  --ember:#F07548; --saffron:#F2B457; --wine:#E58A97; --line:#4A2E21; --ok:#6CC08A;
+  --art-fire:#F07548; --art-grill:#C98A52; --art-smoke:#D3A98F;
+  --shadow:0 10px 30px -12px rgba(0,0,0,.6); color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; font-size:var(--fs)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.no-anim *{transition:none!important;animation:none!important}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;text-wrap:balance;line-height:1.15;margin:0}
+h2{font-size:clamp(1.8rem,4vw,2.6rem)}
+p{margin:0}
+.wrap{max-width:1120px;margin:0 auto;position:relative;z-index:1}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--saffron);outline-offset:2px}
+
+/* ---------- Fondo: fuego, parrilla y humo ---------- */
+.bg-art{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.bg-art .fire path{fill:none;stroke:var(--art-fire);stroke-width:1.6;opacity:.22}
+.bg-art .grill rect,.bg-art .grill line{fill:none;stroke:var(--art-grill);stroke-width:2.4;opacity:.2;stroke-linecap:round}
+.bg-art .smoke path{fill:none;stroke:var(--art-smoke);stroke-width:1.6;opacity:.22;stroke-dasharray:14 10;animation:smoke 18s linear infinite}
+.bg-art .smoke path:nth-child(2){animation-duration:24s}
+.bg-art .smoke path:nth-child(3){animation-duration:30s}
+.bg-art .embers circle{fill:var(--saffron);opacity:.35;animation:twinkle 4s ease-in-out infinite}
+.bg-art .herb path{fill:none;stroke:var(--ok);stroke-width:1.4;opacity:.16;stroke-linecap:round}
+@keyframes smoke{to{stroke-dashoffset:-480}}
+@keyframes twinkle{50%{opacity:.08}}
+
+.demo-bar{position:relative;z-index:25;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 16px;max-width:1120px;margin:10px auto 0;padding:9px 16px;border-radius:999px;font-size:.84rem;background:var(--surface);color:var(--muted);border:1px solid var(--line)}
+.demo-bar a{color:inherit;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+@media (max-width:600px){.demo-bar{border-radius:16px}}
+/* ---------- Navegación ---------- */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;padding-block:12px}
+.nav-in{display:flex;align-items:center;gap:12px;background:color-mix(in srgb,var(--surface) 88%,transparent);
+  backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:999px;padding:8px 8px 8px 20px;box-shadow:var(--shadow)}
+.brand{font-family:var(--f-display);font-size:1.25rem;color:var(--wine);white-space:nowrap}
+.links{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.links a{color:var(--ink);text-decoration:none;padding:8px 14px;border-radius:999px;font-weight:700;font-size:.9rem;white-space:nowrap;transition:background .25s,color .25s}
+.links a:hover{background:var(--surface-2);color:var(--ember)}
+.icon-btn{flex:none;width:42px;height:42px;border-radius:50%;border:0;background:var(--ember);color:#fff;cursor:pointer;display:grid;place-items:center;transition:transform .4s}
+.icon-btn:hover{transform:rotate(60deg)}
+@media (max-width:760px){.links{display:none}.nav-in .icon-btn{margin-left:auto}}
+
+/* ---------- Hero ---------- */
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:32px;align-items:center;padding-block:40px 56px}
+.hero h1{font-size:clamp(2.6rem,7vw,4.8rem);color:var(--wine)}
+.hero h1 span{color:var(--ember)}
+.hero p{font-size:1.15rem;color:var(--muted);max-width:46ch;margin-top:16px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.btn{border:0;border-radius:999px;padding:13px 24px;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:transform .25s,box-shadow .25s,background .25s}
+.btn:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.btn-main{background:var(--ember);color:#fff}
+.btn-soft{background:var(--surface-2);color:var(--wine)}
+.plate{aspect-ratio:1;max-width:100%;border-radius:50%;position:relative;
+  background:radial-gradient(circle at 50% 50%,var(--surface) 0 38%,var(--surface-2) 39% 60%,var(--saffron) 61% 63%,var(--surface-2) 64% 100%);
+  box-shadow:var(--shadow);animation:spin 60s linear infinite}
+.plate canvas{position:absolute;inset:0;width:100%;height:100%}
+.hours-chip{position:absolute;bottom:8%;left:-4%;background:var(--wine-deep);color:#fff;border-radius:var(--r);padding:12px 18px;font-weight:700;box-shadow:var(--shadow);animation:float 5s ease-in-out infinite}
+.hours-chip small{display:block;opacity:.8;font-weight:600}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes float{50%{transform:translateY(-8px)}}
+@keyframes rise{from{transform:translateY(14px)}to{transform:none}}
+@keyframes pop{from{transform:scale(.96) translateY(10px)}to{transform:none}}
+.hero > *{animation:rise .8s cubic-bezier(.2,.8,.2,1) both}
+@media (max-width:760px){.hero{grid-template-columns:1fr}.plate-box{max-width:320px;margin:0 auto}}
+
+section{padding-block:56px;scroll-margin-top:90px}
+.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:.78rem;font-weight:800;color:var(--ember);margin-bottom:8px}
+.head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:16px;margin-bottom:24px}
+.reveal{animation:rise linear both;animation-timeline:view();animation-range:entry 0% entry 40%}
+
+/* ---------- Selector de propuesta ---------- */
+.proposal{display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--surface);border:1px dashed var(--ember);border-radius:var(--r-lg);padding:10px 12px 10px 18px;margin-bottom:28px}
+.proposal b{font-size:.9rem}
+.proposal .seg{flex:1;min-width:260px}
+
+/* ---------- Historia ---------- */
+.story{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.story p{color:var(--muted);max-width:60ch}
+.story p + p{margin-top:14px}
+.timeline{display:grid;gap:12px;list-style:none;margin:0;padding:0}
+.timeline li{display:grid;grid-template-columns:72px 1fr;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;transition:transform .3s}
+.timeline li:hover{transform:translateX(6px)}
+.timeline b{font-family:var(--f-display);font-weight:400;font-size:1.4rem;color:var(--ember)}
+@media (max-width:760px){.story{grid-template-columns:1fr}}
+
+/* ---------- Chips ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 16px;font-weight:700;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:6px}
+.chip svg{width:18px;height:18px}
+.chip[aria-pressed="true"]{background:var(--wine-deep);color:#fff;border-color:var(--wine-deep)}
+.chip:hover{border-color:var(--ember)}
+
+/* ---------- Carta: estructura común ---------- */
+.menu-wrap{position:relative;border-radius:var(--r-lg);transition:background .4s,color .4s}
+.cat-title{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.cat-title svg{width:34px;height:34px;flex:none}
+.cat-title h3{font-size:1.8rem}
+.grid{display:grid;gap:16px}
+.dish{position:relative;animation:pop .45s cubic-bezier(.2,.8,.2,1) both;min-width:0}
+.dish .ico svg{width:100%;height:100%}
+.dish .top{display:flex;align-items:baseline;gap:8px}
+.dish h3{font-size:1.15rem;min-width:0}
+.dish .dots{flex:1;min-width:16px}
+.price{font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+.dish p{font-size:.95rem}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.tag{font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:999px}
+.band{background:color-mix(in srgb,var(--surface-2) 70%,transparent);border-radius:var(--r-lg);padding:40px max(16px,4vw);margin-block:24px}
+
+/* ======== Propuesta 1 · Pizarra de bistró ======== */
+.ms-a .menu-wrap{background:
+   radial-gradient(ellipse at 20% 10%,rgba(255,255,255,.07),transparent 50%),
+   radial-gradient(ellipse at 80% 90%,rgba(255,255,255,.05),transparent 50%),var(--board);
+  color:var(--chalk);border:14px solid var(--wood);padding:34px max(18px,3vw);
+  box-shadow:inset 0 0 70px rgba(0,0,0,.55),0 0 0 3px #5E3B25,var(--shadow)}
+.ms-a .menu-wrap::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);width:46%;height:10px;background:#5E3B25;border-radius:0 0 8px 8px}
+.ms-a .cat-title h3{font-family:var(--f-hand);font-weight:700;font-size:2.6rem;text-decoration:underline wavy rgba(242,236,223,.45);text-underline-offset:8px}
+.ms-a .cat-title svg{color:var(--saffron)}
+.ms-a .grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,310px),1fr));gap:22px 48px}
+.ms-a .dish{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start}
+.ms-a .dish .ico{width:40px;height:40px;color:var(--chalk);opacity:.75;transition:transform .4s}
+.ms-a .dish:hover .ico{transform:rotate(-10deg) scale(1.1)}
+.ms-a .dish h3{font-family:var(--f-hand);font-weight:700;font-size:1.65rem;line-height:1.1}
+.ms-a .dish .dots{border-bottom:2px dashed rgba(242,236,223,.3);transform:translateY(-6px)}
+.ms-a .price{font-family:var(--f-hand);font-size:1.6rem;color:var(--saffron)}
+.ms-a .dish p{color:rgba(242,236,223,.72)}
+.ms-a .tag{background:none;border:1.5px solid rgba(242,236,223,.45);color:var(--chalk)}
+.ms-a .dish:hover h3{text-shadow:0 0 12px rgba(242,236,223,.45)}
+.ms-a .dish.star h3::after{content:" ★";color:var(--saffron)}
+
+/* ======== Propuesta 2 · Tarjetas ilustradas ======== */
+.ms-b .menu-wrap{background:none}
+.ms-b .cat-title{display:none}
+.ms-b .grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:22px}
+.ms-b .dish{background:var(--surface);border-radius:26px;overflow:hidden;box-shadow:var(--shadow);transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s;display:flex;flex-direction:column}
+.ms-b .dish:hover{transform:translateY(-8px) rotate(-.6deg)}
+.ms-b .dish .ico{height:140px;display:grid;place-items:center;color:#fff;position:relative;
+  background:linear-gradient(135deg,var(--ember),var(--saffron))}
+.ms-b .dish:nth-child(3n+2) .ico{background:linear-gradient(135deg,var(--wine-deep),var(--ember))}
+.ms-b .dish:nth-child(3n+3) .ico{background:linear-gradient(135deg,#B8452A,var(--wine-deep))}
+.ms-b .dish .ico::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(-35deg,rgba(255,255,255,.12) 0 2px,transparent 2px 16px)}
+.ms-b .dish .ico svg{width:70px;height:70px;position:relative;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.ms-b .dish:hover .ico svg{transform:scale(1.15) rotate(-8deg)}
+.ms-b .dish .txt{padding:22px 20px 20px;position:relative;display:flex;flex-direction:column;gap:6px;flex:1}
+.ms-b .dish .dots{display:none}
+.ms-b .price{position:absolute;top:-20px;right:16px;background:var(--surface);color:var(--wine);border:2px solid var(--saffron);border-radius:999px;padding:6px 14px;box-shadow:var(--shadow)}
+.ms-b .dish h3{font-size:1.25rem;padding-right:4px}
+.ms-b .dish p{color:var(--muted)}
+.ms-b .tags{margin-top:auto;padding-top:6px}
+.ms-b .tag{background:var(--surface-2);color:var(--wine)}
+.ms-b .dish.star{grid-column:span 2;flex-direction:row}
+.ms-b .dish.star .ico{height:auto;min-height:220px;flex:1}
+.ms-b .dish.star .txt{flex:1.1;justify-content:center;padding-top:56px}
+.ms-b .dish.star .price{top:16px;left:20px;right:auto}
+.ms-b .dish.star .txt::before{content:"Recomendado del chef";font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ember)}
+@media (max-width:620px){.ms-b .dish.star{grid-column:auto;flex-direction:column}.ms-b .dish.star .ico{min-height:140px}}
+
+/* ======== Propuesta 3 · Carta clásica de mantel ======== */
+.ms-c .menu-wrap{background:var(--surface);padding:52px max(22px,5vw) 44px;box-shadow:var(--shadow);outline:2px solid var(--wine);outline-offset:-14px}
+.ms-c .menu-wrap::before{content:"";position:absolute;inset:22px;border:1px solid var(--line);border-radius:16px;pointer-events:none}
+.ms-c .cat-title{justify-content:center;flex-direction:column;gap:6px;text-align:center;margin-bottom:30px}
+.ms-c .cat-title svg{color:var(--ember);width:30px;height:30px}
+.ms-c .cat-title h3{font-size:2.3rem;color:var(--wine)}
+.ms-c .cat-title::after{content:"";width:180px;height:12px;background:
+  radial-gradient(circle,var(--ember) 3px,transparent 4px) center/12px 12px no-repeat,
+  linear-gradient(var(--line),var(--line)) center/100% 1px no-repeat}
+.ms-c .grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:22px 60px;position:relative}
+.ms-c .dish .ico{display:none}
+.ms-c .dish h3{font-size:1.15rem}
+.ms-c .dish .dots{border-bottom:2px dotted var(--muted);opacity:.5;transform:translateY(-5px)}
+.ms-c .price{font-family:var(--f-display);font-weight:400;color:var(--ember);font-size:1.1rem}
+.ms-c .dish p{color:var(--muted);font-style:italic;margin-top:2px}
+.ms-c .tags{margin-top:4px}
+.ms-c .tag{padding:0;background:none;color:var(--ember);text-transform:uppercase;letter-spacing:.1em;font-size:.68rem}
+.ms-c .tag + .tag::before{content:"· ";color:var(--muted)}
+.ms-c .dish{padding:8px 10px;border-radius:12px;transition:background .3s}
+.ms-c .dish:hover{background:var(--surface-2)}
+.ms-c .drinks .menu-wrap{background:var(--wine-deep);color:var(--cream);outline-color:var(--saffron)}
+.ms-c .drinks .menu-wrap::before{border-color:rgba(251,239,230,.2)}
+.ms-c .drinks .cat-title h3{color:var(--cream)}
+.ms-c .drinks .cat-title svg{color:var(--saffron)}
+.ms-c .drinks .price{color:var(--saffron)}
+.ms-c .drinks .dish p{color:rgba(251,239,230,.7)}
+.ms-c .drinks .dish .dots{border-color:rgba(251,239,230,.6)}
+.ms-c .drinks .tag{color:var(--saffron)}
+.ms-c .drinks .dish:hover{background:rgba(255,255,255,.06)}
+.ms-c .drinks .cat-title::after{background:radial-gradient(circle,var(--saffron) 3px,transparent 4px) center/12px 12px no-repeat,linear-gradient(rgba(251,239,230,.25),rgba(251,239,230,.25)) center/100% 1px no-repeat}
+
+/* ---------- Promociones: base + 3 estilos ---------- */
+.promos{display:grid;gap:22px}
+.promo{position:relative;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.promo .big{line-height:1}
+.promo h3{font-size:1.25rem}
+.promo .days{font-weight:800;font-size:.85rem;margin-top:4px}
+.promo p{margin-top:8px;font-size:.95rem}
+.today-pill{position:absolute;top:14px;right:14px;background:var(--saffron);color:#3A1F14;font-weight:800;font-size:.72rem;border-radius:999px;padding:4px 10px;z-index:2}
+
+/* 1 · notas clavadas */
+.ms-a .promos{grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:28px;padding-top:10px}
+.ms-a .promo{background:var(--paper);color:#3A2A14;padding:30px 22px 22px;border-radius:6px 6px 22px 6px;box-shadow:0 14px 24px -14px rgba(0,0,0,.45);transform:rotate(-2deg)}
+.ms-a .promo:nth-child(even){transform:rotate(2deg);background:#FFE9D2}
+.ms-a .promo::before{content:"";position:absolute;top:-9px;left:50%;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#F07548,#9E2A1A);box-shadow:0 3px 4px rgba(0,0,0,.35)}
+.ms-a .promo:hover{transform:rotate(0) translateY(-6px) scale(1.03)}
+.ms-a .promo .big{font-family:var(--f-hand);font-weight:700;font-size:3rem;color:var(--ember)}
+.ms-a .promo h3{font-family:var(--f-hand);font-weight:700;font-size:1.7rem;color:#5E1826}
+.ms-a .promo .days,.ms-a .promo p{color:#6B4A33}
+.ms-a .promo.today{background:var(--saffron)}
+.ms-a .promo.today .big{color:#5E1826}
+
+/* 2 · cupones troquelados */
+.ms-b .promos{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))}
+.ms-b .promo{display:grid;grid-template-columns:120px 1fr;color:#fff;border-radius:22px;overflow:hidden;
+  background:linear-gradient(120deg,var(--wine-deep),#8E2B3A);
+  -webkit-mask:radial-gradient(circle 13px at 120px 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 13px at 120px 100%,#0000 98%,#000) bottom/100% 51% no-repeat;
+          mask:radial-gradient(circle 13px at 120px 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 13px at 120px 100%,#0000 98%,#000) bottom/100% 51% no-repeat}
+.ms-b .promo:hover{transform:translateY(-6px) rotate(-1deg)}
+.ms-b .promo .big{display:grid;place-items:center;font-family:var(--f-display);font-size:1.9rem;color:var(--saffron);background:rgba(0,0,0,.18);border-right:2px dashed rgba(255,255,255,.35);padding:16px 8px;text-align:center}
+.ms-b .promo .pbody{padding:22px 22px 22px 20px}
+.ms-b .promo.today .pbody{padding-top:44px}
+.ms-b .promo .days{color:#F9D9C9}
+.ms-b .promo p{color:#F4D3C6}
+.ms-b .promo.today{background:linear-gradient(120deg,var(--ember),#E9843B)}
+.ms-b .promo.today .big{color:#fff}
+
+/* 3 · tarjetas enmarcadas */
+.ms-c .promos{grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}
+.ms-c .promo{background:var(--surface);text-align:center;padding:30px 22px;border-radius:22px;outline:1px solid var(--wine);outline-offset:-10px;box-shadow:var(--shadow)}
+.ms-c .promo:hover{transform:translateY(-6px)}
+.ms-c .promo .big{font-family:var(--f-display);font-size:2.6rem;color:var(--ember)}
+.ms-c .promo h3{margin-top:12px;color:var(--wine)}
+.ms-c .promo .days{color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-size:.72rem}
+.ms-c .promo p{color:var(--muted);font-style:italic}
+.ms-c .promo .pbody::before{content:"";display:block;width:60px;height:1px;background:var(--line);margin:14px auto 0}
+.ms-c .promo.today{background:var(--wine-deep);outline-color:var(--saffron)}
+.ms-c .promo.today h3,.ms-c .promo.today .big{color:var(--saffron)}
+.ms-c .promo.today .days,.ms-c .promo.today p{color:#F4D3C6}
+
+/* ---------- Reseñas ---------- */
+.reviews{display:grid;grid-template-columns:280px 1fr;gap:24px}
+.score{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px;text-align:center;align-self:start}
+.score .num{font-family:var(--f-display);font-size:3.6rem;color:var(--wine);line-height:1}
+.stars{color:var(--saffron);letter-spacing:2px}
+.rev-list{display:grid;gap:12px;align-content:start}
+.rev{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;animation:pop .4s both}
+.rev .who{display:flex;justify-content:space-between;gap:8px;font-weight:800}
+.rev p{color:var(--muted);margin-top:4px}
+.rev small{color:var(--muted)}
+@media (max-width:760px){.reviews{grid-template-columns:1fr}}
+
+/* ---------- Formularios ---------- */
+form{display:grid;gap:14px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+label{display:grid;gap:6px;font-weight:700;font-size:.9rem}
+input,select,textarea{border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);padding:11px 14px;width:100%;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ember);box-shadow:0 0 0 4px color-mix(in srgb,var(--ember) 20%,transparent)}
+.star-pick{display:flex;gap:4px}
+.star-pick button{border:0;background:none;font-size:1.6rem;cursor:pointer;color:var(--line);transition:transform .2s,color .2s;padding:0 2px}
+.star-pick button.on{color:var(--saffron)}
+.star-pick button:hover{transform:scale(1.2)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px}
+.res{display:grid;grid-template-columns:1.3fr 1fr;gap:24px}
+@media (max-width:760px){.res{grid-template-columns:1fr}}
+.confirm{border-radius:var(--r);background:color-mix(in srgb,var(--ok) 14%,var(--surface));border:1px solid var(--ok);padding:16px;animation:pop .4s both}
+.res-item{display:flex;justify-content:space-between;gap:8px;padding:12px 0;border-bottom:1px dashed var(--line);font-size:.95rem}
+.res-item:last-child{border-bottom:0}
+.muted{color:var(--muted)}
+footer{padding-block:40px;display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;color:var(--muted);border-top:1px solid var(--line);margin-top:40px}
+footer b{color:var(--ink)}
+
+/* ---------- Ventana del código QR ---------- */
+.qr-modal{position:fixed;left:50%;top:50%;width:min(420px,calc(100% - 32px));max-height:calc(100% - 40px);overflow:auto;z-index:55;background:var(--surface);border-radius:var(--r-lg);padding:24px;display:grid;gap:14px;justify-items:center;text-align:center;
+  transform:translate(-50%,-44%) scale(.94);opacity:0;pointer-events:none;transition:transform .4s cubic-bezier(.2,.8,.2,1),opacity .3s;box-shadow:var(--shadow)}
+.qr-modal.open{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}
+.qr-card{background:#fff;color:#3A1F14;border-radius:24px;padding:20px 22px 16px;display:grid;gap:8px;justify-items:center;border:2px solid #F0D2B4;box-shadow:0 0 0 6px #FCE6CC}
+.qr-card .qn{font-family:var(--f-display);font-size:1.4rem;color:#7A2131}
+.qr-card .ql{font-weight:800;font-size:.85rem;color:#86584A}
+#qrBox{width:220px;height:220px}
+#qrBox img,#qrBox canvas{width:220px!important;height:220px!important}
+.qr-link{font-size:.8rem;color:var(--muted);word-break:break-all;user-select:all}
+.qr-acts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.qr-acts .btn{padding:10px 18px}
+/* ---------- Panel de ajustes ---------- */
+.scrim{position:fixed;inset:0;background:rgba(30,10,5,.45);opacity:0;pointer-events:none;transition:opacity .3s;z-index:40}
+.scrim.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(380px,100%);background:var(--surface);z-index:50;
+  border-radius:var(--r-lg) 0 0 var(--r-lg);padding:24px;padding-top:calc(24px + env(safe-area-inset-top,0px));padding-right:max(24px,env(safe-area-inset-right,0px));
+  transform:translateX(105%);transition:transform .45s cubic-bezier(.2,.8,.2,1);overflow-y:auto;display:grid;gap:18px;align-content:start;box-shadow:var(--shadow)}
+.drawer.open{transform:none}
+.drawer h3{font-size:1.5rem;color:var(--wine)}
+.seg{display:flex;background:var(--surface-2);border-radius:999px;padding:4px}
+.seg button{flex:1;border:0;background:none;border-radius:999px;padding:8px 10px;font-weight:700;cursor:pointer;transition:background .25s;white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--surface);box-shadow:0 2px 8px rgba(0,0,0,.12);color:var(--ember)}
+.switch{display:flex;justify-content:space-between;align-items:center;font-weight:700}
+.switch input{width:46px;height:26px;appearance:none;background:var(--line);border-radius:999px;position:relative;cursor:pointer;padding:0;border:0;transition:background .25s}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .25s}
+.switch input:checked{background:var(--ember)}
+.switch input:checked::after{transform:translateX(20px)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,150%);background:var(--wine-deep);color:#fff;padding:12px 20px;border-radius:999px;font-weight:700;z-index:60;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.toast.show{transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body class="ms-a">
+<svg class="bg-art" id="bgArt" aria-hidden="true" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice"></svg>
+
+<div class="demo-bar" role="note"><span><b>Demo con datos de ejemplo.</b> Casa Brasa es un restaurant ficticio; cada local tiene su propia carta.</span><a href="index.html">Volver a Brigada</a></div>
+<header class="nav wrap">
+  <div class="nav-in">
+    <span class="brand" data-name>Casa Brasa</span>
+    <nav class="links" aria-label="Secciones">
+      <a href="#historia" data-sec="historia">Historia</a>
+      <a href="#menu" data-sec="menu">Menú</a>
+      <a href="#tragos" data-sec="tragos">Tragos</a>
+      <a href="#promos" data-sec="promos">Promociones</a>
+      <a href="#resenas" data-sec="resenas">Reseñas</a>
+      <a href="#reserva" data-sec="reserva">Reservar</a>
+    </nav>
+    <button class="icon-btn" id="openSettings" aria-label="Abrir ajustes" title="Ajustes">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Cocina chilena a las brasas · desde 2011</div>
+      <h1><span data-name>Casa Brasa</span><br>fuego lento, mesa larga</h1>
+      <p>Carnes y verduras al carbón de espino, cocteles de autor con pisco del Elqui y una mesa donde siempre cabe uno más.</p>
+      <div class="cta">
+        <a class="btn btn-main" href="#menu">Ver la carta</a>
+        <a class="btn btn-soft" href="#reserva">Reservar mesa</a>
+        <button class="btn btn-soft" id="openQR" type="button">Código QR</button>
+      </div>
+    </div>
+    <div class="plate-box" style="position:relative">
+      <div class="plate"><canvas id="ember" aria-hidden="true"></canvas></div>
+      <div class="hours-chip" id="openChip">Abierto hoy<small>13:00 – 00:00</small></div>
+    </div>
+  </div>
+
+  <section id="historia" data-section="historia">
+    <div class="story reveal">
+      <div>
+        <div class="eyebrow">Nuestra historia</div>
+        <h2>Empezó con una parrilla y doce sillas</h2>
+        <p style="margin-top:16px">En 2011, la familia Contreras abrió un local pequeño en el barrio Italia con una parrilla hecha a mano y doce sillas de madera. La idea era simple: cocinar como en el campo de Curicó, con fuego de espino y tiempo.</p>
+        <p>Hoy seguimos encendiendo el carbón a las once de la mañana para que a la hora de almuerzo las brasas estén listas. Cambió el tamaño de la sala, no la forma de cocinar.</p>
+      </div>
+      <ol class="timeline">
+        <li><b>2011</b><span>Abrimos con 12 sillas y una sola parrilla.</span></li>
+        <li><b>2015</b><span>Llega la barra de coctelería y el primer pisco sour de la casa.</span></li>
+        <li><b>2019</b><span>Sumamos la terraza y el horno de barro para empanadas.</span></li>
+        <li><b>2024</b><span>Abrimos el segundo local y lanzamos esta carta digital.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="menu" data-section="menu">
+    <div class="proposal" id="proposalBar">
+      <b>Elige el estilo de tu carta<br><span class="muted" style="font-weight:600;font-size:.8rem">Tres diseños listos o uno a tu medida</span></b>
+      <div class="seg" id="styleSeg" role="group" aria-label="Estilo de carta">
+        <button data-v="a">1 · Pizarra</button><button data-v="b">2 · Ilustrada</button><button data-v="c">3 · Clásica</button>
+      </div>
+    </div>
+    <div class="head">
+      <div><div class="eyebrow">Carta</div><h2>Menú</h2></div>
+      <div class="chips" id="menuChips" role="group" aria-label="Categorías del menú"></div>
+    </div>
+    <div class="menu-wrap" id="menuWrap"></div>
+  </section>
+
+  <section id="tragos" data-section="tragos">
+    <div class="drinks">
+      <div class="head">
+        <div><div class="eyebrow">Barra</div><h2>Tragos y bebestibles</h2></div>
+        <div class="chips" id="drinkChips" role="group" aria-label="Tipos de bebida"></div>
+      </div>
+      <div class="menu-wrap" id="drinkWrap"></div>
+    </div>
+  </section>
+
+  <section id="promos" data-section="promos">
+    <div class="head"><div><div class="eyebrow">Esta semana</div><h2>Promociones</h2></div>
+      <p class="muted" id="todayLabel"></p></div>
+    <div class="promos" id="promoGrid"></div>
+  </section>
+
+  <section id="resenas" data-section="resenas">
+    <div class="head"><div><div class="eyebrow">Lo que dicen</div><h2>Reseñas</h2></div></div>
+    <div class="reviews">
+      <div style="display:grid;gap:16px;align-content:start">
+        <div class="score"><div class="num" id="avg">4,7</div><div class="stars" id="avgStars">★★★★★</div><div class="muted" id="count"></div></div>
+        <form class="card" id="revForm">
+          <b>Deja tu reseña</b>
+          <div class="star-pick" id="starPick" role="radiogroup" aria-label="Puntuación"></div>
+          <label for="revName">Nombre<input id="revName" required maxlength="40" placeholder="Tu nombre"></label>
+          <label for="revText">Comentario<textarea id="revText" rows="3" required maxlength="300" placeholder="¿Qué te pareció?"></textarea></label>
+          <button class="btn btn-main" type="submit">Publicar reseña</button>
+        </form>
+      </div>
+      <div class="rev-list" id="revList"></div>
+    </div>
+  </section>
+
+  <section id="reserva" data-section="reserva">
+    <div class="head"><div><div class="eyebrow">Tu mesa</div><h2>Reserva</h2></div></div>
+    <div class="res">
+      <form class="card" id="resForm">
+        <div class="row">
+          <label for="rName">Nombre<input id="rName" required placeholder="Nombre y apellido"></label>
+          <label for="rPhone">Teléfono<input id="rPhone" required type="tel" placeholder="+56 9 1234 5678"></label>
+        </div>
+        <div class="row">
+          <label for="rDate">Fecha<input id="rDate" type="date" required></label>
+          <label for="rTime">Hora<select id="rTime"></select></label>
+          <label for="rPeople">Personas<select id="rPeople"></select></label>
+        </div>
+        <label for="rZone">Zona<select id="rZone"><option>Salón</option><option>Terraza</option><option>Barra</option></select></label>
+        <label for="rNote">Comentarios<textarea id="rNote" rows="2" placeholder="Cumpleaños, silla de bebé, alergias…"></textarea></label>
+        <button class="btn btn-main" type="submit">Solicitar reserva</button>
+        <div id="resConfirm" hidden></div>
+      </form>
+      <div class="card">
+        <b>Reservas registradas en este dispositivo</b>
+        <div id="resList" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <div><b data-name>Casa Brasa</b><br>Av. Italia 1234, Providencia, Santiago</div>
+  <div><b>Horario</b><br>Lun a Dom · 13:00 – 00:00</div>
+  <div><b>Contacto</b><br>+56 2 2345 6789</div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Ajustes" aria-hidden="true">
+  <div style="display:flex;justify-content:space-between;align-items:center"><h3>Ajustes</h3>
+    <button class="icon-btn" id="closeSettings" aria-label="Cerrar ajustes">✕</button></div>
+  <label for="setName">Nombre del local<input id="setName" maxlength="40"></label>
+  <div><b>Estilo de carta</b><div class="seg" id="styleSeg2" style="margin-top:6px">
+    <button data-v="a">Pizarra</button><button data-v="b">Ilustrada</button><button data-v="c">Clásica</button></div></div>
+  <label class="switch" for="setBar">Mostrar selector de estilo en la carta<input type="checkbox" id="setBar"></label>
+  <div><b>Tema</b><div class="seg" id="themeSeg" style="margin-top:6px">
+    <button data-v="system">Sistema</button><button data-v="light">Claro</button><button data-v="dark">Oscuro</button></div></div>
+  <div><b>Tamaño de texto</b><div class="seg" id="sizeSeg" style="margin-top:6px">
+    <button data-v="15">A-</button><button data-v="16">A</button><button data-v="18">A+</button></div></div>
+  <label for="setLink">Enlace de la carta (para el QR)<input id="setLink" type="url" placeholder="https://tulocal.cl/carta"></label>
+  <label class="switch" for="setAnim">Animaciones<input type="checkbox" id="setAnim"></label>
+  <label class="switch" for="setArt">Dibujos de fondo<input type="checkbox" id="setArt"></label>
+  <div><b>Secciones visibles</b>
+    <div style="display:grid;gap:10px;margin-top:10px" id="secToggles"></div></div>
+  <button class="btn btn-soft" id="resetAll">Restablecer datos de ejemplo</button>
+</aside>
+<div class="qr-modal" id="qrModal" role="dialog" aria-modal="true" aria-label="Código QR de la carta">
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%"><h3 style="color:var(--wine)">Código QR de la carta</h3>
+    <button class="icon-btn" id="closeQR" aria-label="Cerrar">✕</button></div>
+  <p class="muted" style="font-size:.9rem">Imprímelo para las mesas. Al escanearlo, tus clientes abren esta carta.</p>
+  <label for="qrMesa" style="width:100%;text-align:left">Número de mesa (opcional)<input id="qrMesa" type="number" min="1" max="999" placeholder="Ej. 5"></label>
+  <div class="qr-card"><span class="qn" data-name>Casa Brasa</span><div id="qrBox"></div><span class="ql" id="qrLabel">Escanea y mira nuestra carta</span></div>
+  <span class="qr-link" id="qrLink"></span>
+  <div class="qr-acts"><button class="btn btn-main" id="qrDown" type="button">Descargar PNG</button><button class="btn btn-soft" id="qrCopy" type="button">Copiar enlace</button></div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const clp=n=>"$"+n.toLocaleString("es-CL");
+function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("show"),2400)}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+/* ---------- Íconos por categoría (trazo, toman el color del texto) ---------- */
+const ICO={
+ "Entradas":'<path d="M3 15c0-5 4-9 9-9s9 4 9 9z"/><path d="M5 15c1-1 2 1 3 0s2 1 3 0 2 1 3 0 2 1 3 0 2 1 2 0"/><path d="M12 6V4"/>',
+ "Fondos":'<circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="3"/><path d="M2 4v6a2 2 0 0 0 2 2v8M4 4v5M22 4c-2 0-3 2-3 5v3h2v8"/>',
+ "Para compartir":'<rect x="3" y="7" width="18" height="10" rx="3"/><path d="M7 7v10M11 7v10M15 7v10M19 17l1 4M5 17l-1 4M9 3c0 1.5 1 1.5 1 3M13 3c0 1.5 1 1.5 1 3"/>',
+ "Postres":'<path d="M5 11h14l-2 9H7z"/><path d="M7 11a5 5 0 0 1 10 0"/><path d="M12 6V3"/>',
+ "Coctelería":'<path d="M4 4h16l-8 9z"/><path d="M12 13v7M8 20h8M16 4l3-2"/><circle cx="17" cy="7" r="0.6"/>',
+ "Cervezas":'<path d="M6 7h10v13H6z"/><path d="M16 10h2a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-2M6 7a3 3 0 0 1 3-3 3 3 0 0 1 5 1 2 2 0 0 1 2 2M9 11v6M13 11v6"/>',
+ "Vinos":'<path d="M8 3h8l-1 6a3 3 0 0 1-6 0z"/><path d="M12 12v8M8 21h8M8.5 6h7"/>',
+ "Sin alcohol":'<path d="M6 7h12l-1.5 14h-9z"/><path d="M14 7l2-5h3M7 12h10"/>'
+};
+const svg=(k,c="")=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="${c}" aria-hidden="true">${ICO[k]||ICO["Fondos"]}</svg>`;
+
+/* ---------- Datos de ejemplo ---------- */
+const MENU={
+ "Entradas":[
+  ["Empanada de pino al horno","Carne picada a cuchillo, cebolla, huevo y aceituna.",3200,["Clásico"]],
+  ["Provoleta a la brasa","Queso provolone, orégano y chimichurri de la casa.",6900,["Vegetariano"]],
+  ["Ceviche de reineta","Reineta, limón de Pica, cilantro y camote.",8900,["Sin gluten"]],
+  ["Choripán de la casa","Chorizo artesanal, pebre y pan amasado.",5400,[]]],
+ "Fondos":[
+  ["Lomo vetado 350 g","Al espino, con papas rústicas y ensalada chilena.",18900,["Estrella"]],
+  ["Costillar de cerdo","Cocción lenta 6 horas, glaseado de merkén.",15900,["Picante"]],
+  ["Pollo de campo","Medio pollo marinado en ajo y romero.",12900,["Sin gluten"]],
+  ["Pastel de choclo","Receta de la abuela, en greda.",11900,["Temporada"]],
+  ["Risotto de hongos","Hongos de pino, parmesano y aceite de trufa.",12400,["Vegetariano"]]],
+ "Para compartir":[
+  ["Parrillada Brasa (2 p.)","Lomo, pollo, chorizo, longaniza y prietas.",32900,["Estrella","Para 2"]],
+  ["Tabla de verduras","Zapallo, pimentón, choclo y champiñones al carbón.",13900,["Vegano"]],
+  ["Tabla de quesos y charcutería","Quesos de Chiloé, jamón serrano y mermelada de ají.",14900,[]]],
+ "Postres":[
+  ["Leche asada","Con caramelo de chancaca.",4500,[]],
+  ["Mote con huesillo helado","Versión de autor en copa.",4200,["Clásico"]],
+  ["Volcán de chocolate","Centro líquido y helado de lúcuma.",5900,[]]]
+};
+const DRINKS={
+ "Coctelería":[
+  ["Pisco sour Brasa","Pisco del Elqui 40°, limón de Pica, amargo de angostura.",5900,["Estrella"]],
+  ["Ahumado de espino","Whisky, miel de ulmo y humo de espino.",7900,["Autor"]],
+  ["Mango sour","Pisco, pulpa de mango y merkén en el borde.",6400,[]],
+  ["Ramazzotti spritz","Ramazzotti rosato, espumante y soda.",6900,[]]],
+ "Cervezas":[
+  ["Schop artesanal 500 cc","Rubia, ámbar o stout, según temporada.",4500,[]],
+  ["Cerveza sin alcohol","Lager 0,0 %.",3500,["0 %"]]],
+ "Vinos":[
+  ["Carménère Reserva (copa)","Valle del Colchagua.",5200,[]],
+  ["Sauvignon Blanc (botella)","Valle de Casablanca.",18900,[]],
+  ["Cabernet Sauvignon (botella)","Valle del Maipo.",21900,[]]],
+ "Sin alcohol":[
+  ["Limonada menta jengibre","Jarra 1 L.",5900,[]],
+  ["Jugo natural","Frambuesa, mango o piña.",3900,[]],
+  ["Bebida en lata","350 cc.",2200,[]]]
+};
+const PROMOS=[
+ {days:[1,2,3,4],big:"2x1",t:"Happy hour de pisco sour",d:"Lun a Jue · 18:00 – 21:00",p:"Dos pisco sour Brasa por el precio de uno en barra y terraza."},
+ {days:[2],big:"-30%",t:"Martes de parrillada",d:"Martes · todo el día",p:"30 % de descuento en la Parrillada Brasa para dos."},
+ {days:[5,6],big:"$9.900",t:"Menú del fin de semana",d:"Vie y Sáb · almuerzo",p:"Entrada, fondo y postre del día."},
+ {days:[0],big:"Gratis",t:"Domingo familiar",d:"Domingo · 13:00 – 17:00",p:"Postre gratis para menores de 12 años por cada fondo adulto."}
+];
+const REV0=[
+ {n:"Camila R.",s:5,t:"El lomo vetado en su punto exacto y el pisco sour de los mejores que he probado.",d:"2026-10-12"},
+ {n:"Felipe M.",s:4,t:"Muy buena atención. La terraza se llena rápido, conviene reservar.",d:"2026-10-05"},
+ {n:"Javiera P.",s:5,t:"Fuimos por un cumpleaños y nos sorprendieron con el postre. Volveremos.",d:"2026-09-28"},
+ {n:"Andrés T.",s:5,t:"El costillar se deshace. Porciones generosas.",d:"2026-09-20"}
+];
+const SECS=[["historia","Historia"],["menu","Menú"],["tragos","Tragos"],["promos","Promociones"],["resenas","Reseñas"],["reserva","Reserva"]];
+
+/* ---------- Fondo: fuego, parrilla, humo, brasas y una rama de romero ---------- */
+(function(){
+  const flame=s=>`M0 ${-120*s} C ${50*s} ${-60*s} ${70*s} ${-10*s} ${40*s} ${40*s} C ${25*s} ${65*s} ${-25*s} ${65*s} ${-40*s} ${40*s} C ${-70*s} ${-10*s} ${-30*s} ${-50*s} 0 ${-120*s} Z`;
+  let fire='';for(let i=1;i<=6;i++)fire+=`<path d="${flame(i*.55)}"/>`;
+  let fire2='';for(let i=1;i<=4;i++)fire2+=`<path d="${flame(i*.4)}"/>`;
+  let bars='';for(let x=40;x<460;x+=38)bars+=`<line x1="${x}" y1="18" x2="${x}" y2="282"/>`;
+  const smoke=[0,1,2].map(i=>{const x=150+i*45;let d=`M${x} 700`;for(let y=700,k=0;y>120;y-=90,k++)d+=` Q ${x+(k%2?60:-60)} ${y-45} ${x+(k%2?10:-10)} ${y-90}`;return `<path d="${d}"/>`}).join("");
+  let emb='';for(let i=0;i<22;i++){const x=Math.random()*1440,y=420+Math.random()*480,r=1.5+Math.random()*2.5;emb+=`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(1)}" style="animation-delay:${(Math.random()*4).toFixed(1)}s"/>`}
+  let leaves='';for(let i=0;i<9;i++){const y=40+i*34,s=i%2?1:-1;leaves+=`<path d="M0 ${y} q ${26*s} -10 ${40*s} -34"/>`}
+  $("#bgArt").innerHTML=`
+   <g class="fire" transform="translate(150 820)">${fire}</g>
+   <g class="fire" transform="translate(1330 900)">${fire2}</g>
+   <g class="smoke">${smoke}</g>
+   <g class="grill" transform="translate(1050 -70) rotate(14)"><rect x="0" y="0" width="500" height="300" rx="34"/>${bars}</g>
+   <g class="herb" transform="translate(1250 360) rotate(18)"><path d="M0 0 L0 360"/>${leaves}</g>
+   <g class="embers">${emb}</g>`;
+})();
+
+/* ---------- Ajustes ---------- */
+const DEF={link:"",name:"Casa Brasa",theme:"system",size:"16",anim:true,art:true,hide:[],style:"a",bar:true};
+let S=Object.assign({},DEF,store.get("carta_settings",{}));
+function applySettings(){
+  document.querySelectorAll("[data-name]").forEach(e=>e.textContent=S.name);
+  const r=document.documentElement;
+  if(S.theme==="system")r.removeAttribute("data-theme");else r.setAttribute("data-theme",S.theme);
+  r.style.setProperty("--fs",S.size+"px");
+  document.body.classList.toggle("no-anim",!S.anim);
+  document.body.classList.remove("ms-a","ms-b","ms-c");document.body.classList.add("ms-"+S.style);
+  $("#bgArt").style.display=S.art?"":"none";
+  $("#proposalBar").hidden=!S.bar;
+  SECS.forEach(([id])=>{const h=S.hide.includes(id);
+    document.querySelector(`[data-section="${id}"]`).hidden=h;
+    document.querySelector(`[data-sec="${id}"]`).hidden=h});
+  const mark=(sel,v)=>document.querySelectorAll(sel+" button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===v));
+  mark("#themeSeg",S.theme);mark("#sizeSeg",S.size);mark("#styleSeg",S.style);mark("#styleSeg2",S.style);
+  $("#setName").value=S.name;$("#setLink").value=S.link||"";$("#setAnim").checked=S.anim;$("#setArt").checked=S.art;$("#setBar").checked=S.bar;
+  store.set("carta_settings",S);
+}
+$("#secToggles").innerHTML=SECS.map(([id,l])=>`<label class="switch" for="sec_${id}">${l}<input type="checkbox" id="sec_${id}" data-id="${id}"></label>`).join("");
+$("#secToggles").querySelectorAll("input").forEach(i=>{i.checked=!S.hide.includes(i.dataset.id);
+  i.onchange=()=>{S.hide=S.hide.filter(x=>x!==i.dataset.id);if(!i.checked)S.hide.push(i.dataset.id);applySettings()}});
+const setStyle=v=>{S.style=v;applySettings();menuTabs.draw();drinkTabs.draw();drawPromos()};
+$("#styleSeg").onclick=e=>{const v=e.target.closest("button")?.dataset.v;if(v)setStyle(v)};
+$("#styleSeg2").onclick=e=>{const v=e.target.closest("button")?.dataset.v;if(v)setStyle(v)};
+$("#themeSeg").onclick=e=>{if(e.target.dataset.v){S.theme=e.target.dataset.v;applySettings()}};
+$("#sizeSeg").onclick=e=>{if(e.target.dataset.v){S.size=e.target.dataset.v;applySettings()}};
+$("#setName").oninput=e=>{S.name=e.target.value||"Mi restaurant";applySettings()};
+$("#setLink").onchange=e=>{S.link=e.target.value.trim();applySettings();toast("Enlace del QR guardado")};
+$("#setAnim").onchange=e=>{S.anim=e.target.checked;applySettings();if(S.anim)emberLoop()};
+$("#setArt").onchange=e=>{S.art=e.target.checked;applySettings()};
+$("#setBar").onchange=e=>{S.bar=e.target.checked;applySettings()};
+function drawer(o){$("#drawer").classList.toggle("open",o);$("#scrim").classList.toggle("open",o);$("#drawer").setAttribute("aria-hidden",!o)}
+$("#openSettings").onclick=()=>drawer(true);$("#closeSettings").onclick=()=>drawer(false);$("#scrim").onclick=()=>{drawer(false);qrOpen(false)};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){drawer(false);qrOpen(false)}});
+let resetArmed=false;
+$("#resetAll").onclick=e=>{
+  if(!resetArmed){resetArmed=true;e.target.textContent="Toca de nuevo para confirmar";setTimeout(()=>{resetArmed=false;e.target.textContent="Restablecer datos de ejemplo"},3000);return}
+  store.set("carta_reviews",REV0);store.set("carta_reservas",[]);S=Object.assign({},DEF);
+  $("#secToggles").querySelectorAll("input").forEach(i=>i.checked=true);
+  applySettings();setStyle(S.style);renderReviews();renderRes();e.target.textContent="Restablecer datos de ejemplo";resetArmed=false;toast("Datos restablecidos")};
+
+/* ---------- Menú y tragos ---------- */
+function tabs(data,chipsEl,wrapEl){
+  const cats=Object.keys(data);let cur=cats[0];
+  function draw(){
+    chipsEl.innerHTML=cats.map(c=>`<button class="chip" aria-pressed="${c===cur}" data-c="${c}">${svg(c)}${c}</button>`).join("");
+    wrapEl.innerHTML=`<div class="cat-title">${svg(cur)}<h3>${cur}</h3></div><div class="grid">`+
+      data[cur].map(([n,d,p,t],i)=>`<article class="dish ${t.includes("Estrella")?"star":""}" style="animation-delay:${i*70}ms">
+       <div class="ico">${svg(cur)}</div>
+       <div class="txt"><div class="top"><h3>${n}</h3><span class="dots"></span><span class="price">${clp(p)}</span></div><p>${d}</p>
+       ${t.filter(x=>x!=="Estrella").length?`<div class="tags">${t.filter(x=>x!=="Estrella").map(x=>`<span class="tag">${x}</span>`).join("")}</div>`:""}</div></article>`).join("")+`</div>`;
+  }
+  chipsEl.onclick=e=>{const c=e.target.closest("button")?.dataset.c;if(c){cur=c;draw()}};draw();
+  return {draw};
+}
+const menuTabs=tabs(MENU,$("#menuChips"),$("#menuWrap"));
+const drinkTabs=tabs(DRINKS,$("#drinkChips"),$("#drinkWrap"));
+
+/* ---------- Promos ---------- */
+const DAYN=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+const today=new Date().getDay();
+$("#todayLabel").textContent="Hoy es "+DAYN[today];
+function drawPromos(){
+  $("#promoGrid").innerHTML=PROMOS.map((p,i)=>{const on=p.days.includes(today);
+    return `<article class="promo ${on?"today":""}" style="animation:pop .45s ${i*80}ms both">${on?'<span class="today-pill">Hoy</span>':""}
+    <div class="big">${p.big}</div><div class="pbody"><h3>${p.t}</h3><div class="days">${p.d}</div><p>${p.p}</p></div></article>`}).join("")}
+drawPromos();
+
+/* ---------- Reseñas ---------- */
+let rating=5;
+function stars(n){return "★".repeat(n)+"☆".repeat(5-n)}
+function drawPick(){$("#starPick").innerHTML=[1,2,3,4,5].map(i=>`<button type="button" role="radio" aria-checked="${i===rating}" aria-label="${i} estrellas" class="${i<=rating?"on":""}" data-i="${i}">★</button>`).join("")}
+$("#starPick").onclick=e=>{if(e.target.dataset.i){rating=+e.target.dataset.i;drawPick()}};drawPick();
+function renderReviews(){
+  const R=store.get("carta_reviews",REV0);
+  const avg=R.reduce((a,r)=>a+r.s,0)/R.length;
+  $("#avg").textContent=avg.toFixed(1).replace(".",",");
+  $("#avgStars").textContent=stars(Math.round(avg));
+  $("#count").textContent=R.length+" reseñas";
+  $("#revList").innerHTML=R.map(r=>`<article class="rev"><div class="who"><span>${esc(r.n)}</span><span class="stars">${stars(r.s)}</span></div>
+    <p>${esc(r.t)}</p><small>${new Date(r.d+"T12:00").toLocaleDateString("es-CL",{day:"numeric",month:"long",year:"numeric"})}</small></article>`).join("");
+}
+$("#revForm").onsubmit=e=>{e.preventDefault();
+  const R=store.get("carta_reviews",REV0);
+  R.unshift({n:$("#revName").value.trim(),s:rating,t:$("#revText").value.trim(),d:new Date().toISOString().slice(0,10)});
+  store.set("carta_reviews",R);e.target.reset();rating=5;drawPick();renderReviews();toast("Reseña publicada")};
+renderReviews();
+
+/* ---------- Reserva ---------- */
+const d0=new Date();$("#rDate").min=d0.toISOString().slice(0,10);
+d0.setDate(d0.getDate()+1);$("#rDate").value=d0.toISOString().slice(0,10);
+const times=[];for(let h=13;h<=23;h++){times.push(h+":00");if(h<23)times.push(h+":30")}
+$("#rTime").innerHTML=times.map(t=>`<option ${t==="20:30"?"selected":""}>${t}</option>`).join("");
+$("#rPeople").innerHTML=Array.from({length:12},(_,i)=>`<option ${i===1?"selected":""}>${i+1}</option>`).join("");
+function renderRes(){
+  const L=store.get("carta_reservas",[]);
+  $("#resList").innerHTML=L.length?L.map(r=>`<div class="res-item"><span><b>${esc(r.name)}</b><br><span class="muted">${r.zone} · ${r.people} pers.</span></span>
+  <span style="text-align:right">${new Date(r.date+"T12:00").toLocaleDateString("es-CL",{weekday:"short",day:"numeric",month:"short"})}<br><b>${r.time}</b></span></div>`).join("")
+  :'<p class="muted" style="margin-top:8px">Aún no hay reservas. Completa el formulario y aparecerán aquí.</p>';
+}
+$("#resForm").onsubmit=e=>{e.preventDefault();
+  const r={name:$("#rName").value.trim(),phone:$("#rPhone").value.trim(),date:$("#rDate").value,time:$("#rTime").value,people:$("#rPeople").value,zone:$("#rZone").value,note:$("#rNote").value.trim()};
+  const L=store.get("carta_reservas",[]);L.unshift(r);store.set("carta_reservas",L);renderRes();
+  const c=$("#resConfirm");c.hidden=false;
+  c.innerHTML=`<div class="confirm"><b>Solicitud registrada</b><br>${esc(r.name)}, mesa para ${r.people} el ${new Date(r.date+"T12:00").toLocaleDateString("es-CL",{weekday:"long",day:"numeric",month:"long"})} a las ${r.time} (${r.zone}). Te confirmaremos al ${esc(r.phone)}.</div>`;
+  e.target.querySelectorAll("#rName,#rPhone,#rNote").forEach(i=>i.value="");toast("Reserva solicitada")};
+renderRes();
+
+/* ---------- Abierto/cerrado ---------- */
+(function(){const h=new Date().getHours();const open=h>=13;
+  $("#openChip").innerHTML=(open?"Abierto ahora":"Abrimos a las 13:00")+"<small>Lun a Dom · 13:00 – 00:00</small>"})();
+
+/* ---------- Brasas animadas en el plato ---------- */
+const c=$("#ember"),cx=c.getContext("2d");let W,H,P=[],running=false;
+function size(){W=c.width=c.offsetWidth*2;H=c.height=c.offsetHeight*2}
+size();addEventListener("resize",size);
+for(let i=0;i<40;i++)P.push({a:Math.random()*6.28,r:Math.random()*.3,s:.002+Math.random()*.004,z:2+Math.random()*5,h:20+Math.random()*25});
+function frame(){cx.clearRect(0,0,W,H);
+  P.forEach(p=>{p.a+=p.s;const R=Math.min(W,H)*p.r;cx.beginPath();cx.fillStyle=`hsla(${p.h},90%,55%,.55)`;cx.arc(W/2+Math.cos(p.a)*R,H/2+Math.sin(p.a)*R,p.z,0,7);cx.fill()});
+  if(S.anim&&!matchMedia("(prefers-reduced-motion: reduce)").matches)requestAnimationFrame(frame);else running=false}
+function emberLoop(){if(!running){running=true;frame()}}
+/* ---------- Código QR ---------- */
+function carteUrl(){if(S.link)return S.link;
+  if(/^https?:/.test(location.protocol)&&!/claude|anthropic|usercontent/.test(location.host))return location.href.split("#")[0];
+  return "https://genrodo.github.io/brigada/carta.html"}
+function qrUrl(){const m=$("#qrMesa").value;return carteUrl()+(m?"#mesa-"+m:"")}
+function drawQR(){const box=$("#qrBox");box.innerHTML="";const u=qrUrl();$("#qrLink").textContent=u;
+  const m=$("#qrMesa").value;$("#qrLabel").textContent=m?"Mesa "+m+" · Escanea y mira nuestra carta":"Escanea y mira nuestra carta";
+  if(typeof QRCode==="undefined"){box.innerHTML='<p class="muted" style="padding-top:80px">No se pudo cargar el generador de QR. Revisa tu conexión.</p>';return}
+  new QRCode(box,{text:u,width:440,height:440,colorDark:"#3A1F14",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M})}
+function qrOpen(o){$("#qrModal").classList.toggle("open",o);$("#scrim").classList.toggle("open",o||$("#drawer").classList.contains("open"));if(o)drawQR()}
+$("#openQR").onclick=()=>qrOpen(true);$("#closeQR").onclick=()=>qrOpen(false);
+$("#qrMesa").oninput=drawQR;
+$("#qrCopy").onclick=()=>{const t=qrUrl();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Enlace copiado"),()=>{const r=document.createRange();r.selectNodeContents($("#qrLink"));const sel=getSelection();sel.removeAllRanges();sel.addRange(r);toast("Enlace seleccionado: cópialo con Ctrl+C")})};
+$("#qrDown").onclick=()=>{const src=$("#qrBox canvas");if(!src){toast("El QR aún no está listo");return}
+  const W=600,H=760,cv=document.createElement("canvas");cv.width=W;cv.height=H;const g=cv.getContext("2d");
+  g.fillStyle="#FFF4E6";g.fillRect(0,0,W,H);g.fillStyle="#ffffff";g.beginPath();g.roundRect(30,30,W-60,H-60,40);g.fill();
+  g.strokeStyle="#F0D2B4";g.lineWidth=4;g.stroke();
+  g.fillStyle="#7A2131";g.font="44px 'Yeseva One', Georgia, serif";g.textAlign="center";g.fillText(S.name,W/2,110);
+  g.drawImage(src,W/2-220,150,440,440);
+  g.fillStyle="#86584A";g.font="bold 26px Nunito, sans-serif";g.fillText($("#qrLabel").textContent,W/2,650);
+  try{const a=document.createElement("a");a.href=cv.toDataURL("image/png");a.download="qr-carta"+($("#qrMesa").value?"-mesa-"+$("#qrMesa").value:"")+".png";document.body.appendChild(a);a.click();a.remove();toast("Descargando QR")}catch(e){toast("No se pudo descargar en esta vista")}};
+applySettings();emberLoop();
+</script>
+</body>
+</html>

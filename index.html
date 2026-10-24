@@ -2,528 +2,288 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Brigada</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Brigada: La Carta para tus clientes y un portal para tu equipo. Menú, reservas, horarios, asistencia y anticipos.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: riel de comandas — el hero es un ticket de cocina; cada producto es un "puesto" de la brigada */
+/* Layout: bandas a todo el ancho que alternan Deep Forest y arena; los tres productos como "puestos" de la brigada de cocina */
 :root{
-  --bg:#EDF0EE;          /* acero cepillado */
-  --surface:#FFFFFF;
-  --ink:#14201B;
-  --muted:#56625C;
-  --line:#CBD3CF;
-  --accent:#1E6A4C;      /* verde albahaca */
-  --accent-ink:#FFFFFF;
-  --ticket:#FFFDF6;      /* papel térmico */
-  --flag:#E9B83A;        /* amarillo comanda, uso mínimo */
-  --warn:#B4441F;
-  --ok:#1E6A4C;
-  --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
-  --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --forest:#0F3D3A; --forest-2:#0B2E2C; --forest-3:#155550; --gold:#F4B13B; --sand:#F2E6D6; --sand-2:#E8D7C1; --ink:#0D2321; --cream-ink:#5A4A37;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Figtree", "Segoe UI", system-ui, sans-serif;
+  --r:18px; --r-lg:28px;
+  color-scheme:dark;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0F1513;--surface:#18201D;--ink:#E6ECE9;--muted:#9AA8A1;--line:#2C3833;
-  --accent:#5FBF95;--accent-ink:#0B1310;--ticket:#1D2421;--flag:#E9B83A;--warn:#E07A55;--ok:#5FBF95;color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0F1513;--surface:#18201D;--ink:#E6ECE9;--muted:#9AA8A1;--line:#2C3833;
-  --accent:#5FBF95;--accent-ink:#0B1310;--ticket:#1D2421;--flag:#E9B83A;--warn:#E07A55;--ok:#5FBF95;color-scheme:dark}
-
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.wrap{max-width:1120px;margin:0 auto}
-a{color:inherit}
-:focus-visible{outline:3px solid var(--flag);outline-offset:3px;border-radius:4px}
-h1,h2,h3{font-family:var(--f-display);text-transform:uppercase;line-height:.95;letter-spacing:.01em;text-wrap:balance;margin:0}
-h1{font-size:clamp(3rem,8vw,6rem);font-weight:900}
-h2{font-size:clamp(2.2rem,5vw,3.4rem);font-weight:800}
-h3{font-size:1.9rem;font-weight:800}
+body{margin:0;background:var(--forest);color:var(--sand);font-family:var(--f-body);line-height:1.6;font-size:16px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--forest)}
+h1,h2,h3{font-family:var(--f-display);margin:0;line-height:1.05;text-wrap:balance;letter-spacing:-.02em}
 p{margin:0}
-.eyebrow{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-.lead{font-size:1.15rem;color:var(--muted);max-width:52ch}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.in{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.band{padding-block:88px}
+.band.sand{background:var(--sand);color:var(--ink)}
+.eyebrow{font-weight:700;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.sand .eyebrow{color:#9A6410}
 
-/* nav */
-nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:21;background:var(--bg)}
-nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:14px}
-.logo{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:900;font-size:1.7rem;text-transform:uppercase;text-decoration:none;letter-spacing:.04em}
-.logo svg{width:30px;height:30px}
-.navlinks{display:flex;gap:22px;align-items:center;font-weight:600;font-size:.95rem}
-.navlinks a{text-decoration:none;color:var(--muted)}
-.navlinks a:hover{color:var(--ink)}
-@media (max-width:720px){.navlinks a:not(.btn){display:none}}
-.btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:var(--accent-ink)!important;text-decoration:none;font-weight:700;padding:11px 18px;border-radius:6px;border:0;font:inherit;font-weight:700;cursor:pointer}
-.btn:hover{filter:brightness(1.08)}
-.btn.ghost{background:transparent;color:var(--ink)!important;border:1.5px solid var(--ink)}
+/* Nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--forest) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid rgba(242,230,214,.08)}
+.nav .in{display:flex;align-items:center;gap:16px;padding-block:14px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:800;font-size:1.35rem;text-decoration:none;color:var(--sand)}
+.logo svg{flex:none}
+.nav nav{display:flex;gap:4px;margin-left:auto}
+.nav nav a{text-decoration:none;padding:8px 14px;border-radius:999px;font-weight:600;font-size:.92rem;transition:background .25s}
+.nav nav a:hover{background:rgba(242,230,214,.08)}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:13px 24px;font-weight:700;text-decoration:none;border:0;cursor:pointer;font:inherit;font-weight:700;transition:transform .25s,box-shadow .25s,background .25s}
+.btn:hover{transform:translateY(-2px)}
+.btn-gold{background:var(--gold);color:var(--forest-2);box-shadow:0 10px 30px -12px rgba(244,177,59,.6)}
+.btn-line{border:1.5px solid rgba(242,230,214,.35);color:var(--sand)}
+.btn-line:hover{border-color:var(--gold)}
+.btn-forest{background:var(--forest);color:var(--sand)}
+@media (max-width:760px){.nav nav{display:none}.nav .btn{margin-left:auto;padding:10px 16px}}
 
-/* hero */
-.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:56px;align-items:center;padding-block:72px 64px}
-.hero > div{min-width:0;display:flex;flex-direction:column;gap:24px}
-.hero h1 em{font-style:normal;color:var(--accent)}
-.ctas{display:flex;gap:12px;flex-wrap:wrap}
-@media (max-width:860px){.hero{grid-template-columns:1fr;gap:40px;padding-block:44px}}
+/* Hero */
+.hero{padding-block:72px 96px;position:relative;overflow:hidden}
+.hero .in{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:center}
+.hero h1{font-size:clamp(2.6rem,6vw,4.4rem);font-weight:800}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero p.lead{font-size:1.2rem;color:rgba(242,230,214,.8);max-width:48ch;margin-top:22px}
+.hero .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.hero .def{margin-top:36px;display:flex;gap:14px;align-items:baseline;border-top:1px solid rgba(242,230,214,.15);padding-top:18px;max-width:52ch;font-size:.92rem;color:rgba(242,230,214,.7)}
+.hero .def b{font-family:var(--f-display);color:var(--sand);font-size:1.05rem}
+.hero .def i{color:var(--gold);font-style:normal}
+@keyframes rise{from{transform:translateY(28px)}to{transform:none}}
+@keyframes up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.hero .copy > *{animation:up .8s cubic-bezier(.2,.8,.2,1) both}
+.hero .copy > *:nth-child(2){animation-delay:.08s}.hero .copy > *:nth-child(3){animation-delay:.16s}.hero .copy > *:nth-child(4){animation-delay:.24s}.hero .copy > *:nth-child(5){animation-delay:.32s}
 
-/* ticket */
-.rail{position:relative;padding-top:18px}
-.rail::before{content:"";position:absolute;top:0;left:-10px;right:-10px;height:12px;border-radius:3px;
-  background:linear-gradient(180deg,#b9c2be,#8d9893);box-shadow:0 2px 0 rgba(0,0,0,.08)}
-.ticket{background:var(--ticket);font-family:var(--f-mono);font-size:.86rem;padding:22px 22px 30px;transform:rotate(-1.4deg);
-  box-shadow:0 14px 30px -12px rgba(20,32,27,.35);position:relative;max-width:380px;margin:0 auto;
-  -webkit-mask:radial-gradient(circle 7px at 50% 100%,transparent 6.5px,#000 7px) 0 0/16px 100%;
-          mask:radial-gradient(circle 7px at 50% 100%,transparent 6.5px,#000 7px) 0 0/16px 100%}
-.ticket .t-head{display:flex;justify-content:space-between;border-bottom:1.5px dashed var(--line);padding-bottom:10px;margin-bottom:10px;font-weight:600}
-.ticket ul{list-style:none;margin:0;padding:0;display:grid;gap:7px}
-.ticket li{display:grid;grid-template-columns:1fr auto;gap:10px}
-.ticket li span:last-child{font-variant-numeric:tabular-nums}
-.ticket .tag{display:inline-block;font-size:.7rem;padding:1px 6px;border-radius:3px;margin-left:6px;vertical-align:1px}
-.tag.ok{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
-.tag.late{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
-.tag.ext{background:color-mix(in srgb,var(--flag) 30%,transparent);color:var(--ink)}
-.ticket .t-foot{border-top:1.5px dashed var(--line);margin-top:12px;padding-top:10px;display:flex;justify-content:space-between;font-weight:600}
-.stamp{position:absolute;right:14px;bottom:36px;font-family:var(--f-display);font-weight:900;font-size:1.5rem;color:var(--accent);
-  border:3px solid var(--accent);padding:2px 10px;transform:rotate(-9deg);opacity:.85;letter-spacing:.06em}
+/* Pila de pantallas */
+.stack{position:relative;height:460px;max-width:100%}
+.scr{position:absolute;width:min(330px,78%);border-radius:var(--r-lg);overflow:hidden;box-shadow:0 30px 60px -20px rgba(0,0,0,.55);transition:transform .6s cubic-bezier(.2,.8,.2,1),z-index 0s .2s;cursor:pointer;border:0;padding:0;text-align:left;font:inherit;text-decoration:none}
+.scr .bar{height:28px;display:flex;align-items:center;gap:5px;padding:0 12px}
+.scr .bar i{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.35}
+.scr .body{padding:16px;display:grid;gap:10px;min-height:250px}
+.s-carta{background:#FFF4E6;color:#3A1F14;left:0;top:30px;transform:rotate(-7deg);z-index:1}
+.s-carta .bar{background:#F7DEC2}
+.s-carta .t{font-family:Georgia,serif;font-size:1.5rem;color:#7A2131}
+.s-carta .dish{background:#fff;border-radius:14px;padding:10px 12px;display:flex;justify-content:space-between;font-size:.82rem;font-weight:600}
+.s-carta .dish b{color:#D9542B}
+.s-trab{background:#EDF3FC;color:#0B1B33;left:18%;top:0;transform:rotate(2deg);z-index:2}
+.s-trab .bar{background:#0C2D5E;color:#fff}
+.s-trab .kp{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.s-trab .kp div{background:#fff;border-radius:12px;padding:10px;font-size:.72rem}
+.s-trab .kp b{display:block;color:#1F5FD6;font-size:1.3rem;font-family:var(--f-display)}
+.s-trab .row{background:#fff;border-radius:12px;padding:8px 10px;font-size:.78rem;display:flex;justify-content:space-between}
+.s-trab .row span:last-child{color:#1F5FD6;font-weight:700}
+.s-hor{background:#fff;color:#0A0A0A;right:0;top:120px;transform:rotate(8deg);z-index:3;border:2px solid #0A0A0A}
+.s-hor .bar{background:#0A0A0A;color:#fff}
+.s-hor .g{display:grid;grid-template-columns:70px repeat(5,1fr);gap:3px;font-family:ui-monospace,Menlo,monospace;font-size:.62rem}
+.s-hor .g span{padding:5px 2px;text-align:center;border-radius:4px;background:#F1F1F1}
+.s-hor .g span.h{background:#0A0A0A;color:#fff}
+.s-hor .g span.n{text-align:left;background:none;font-weight:700}
+.s-hor .g span.l{background:repeating-linear-gradient(135deg,#ddd 0 3px,#fff 3px 7px)}
+.stack:hover .s-carta{transform:rotate(-10deg) translate(-16px,6px)}
+.stack:hover .s-hor{transform:rotate(11deg) translate(16px,10px)}
+.scr:hover,.scr:focus-visible{transform:rotate(0) translateY(-14px) scale(1.03)!important;z-index:5!important;transition:transform .5s cubic-bezier(.2,.8,.2,1),z-index 0s}
+@media (max-width:900px){.hero .in{grid-template-columns:1fr}.stack{height:420px;max-width:440px;width:100%;margin:0 auto}}
 
-/* strip */
-.strip{border-block:1px solid var(--line);padding-block:20px}
-.strip .wrap{display:flex;flex-wrap:wrap;gap:12px 40px;justify-content:space-between;font-family:var(--f-mono);font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+/* Productos */
+.head{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:end;margin-bottom:48px}
+.head h2{font-size:clamp(2rem,5vw,3.4rem)}
+.head p{color:var(--cream-ink);font-size:1.08rem;max-width:52ch}
+@media (max-width:800px){.head{grid-template-columns:1fr}}
+.products{display:grid;gap:20px}
+.prod{display:grid;grid-template-columns:200px 1fr auto;gap:28px;align-items:center;background:#FBF5EC;border-radius:var(--r-lg);padding:28px;border:1px solid var(--sand-2);transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.prod:hover{transform:translateY(-4px);box-shadow:0 24px 48px -24px rgba(15,61,58,.45)}
+.prod .role{font-family:var(--f-display);font-weight:700;font-size:.95rem;color:var(--forest-3)}
+.prod .role small{display:block;font-family:var(--f-body);font-weight:500;color:var(--cream-ink);font-size:.82rem;margin-top:2px}
+.prod h3{font-size:1.8rem;color:var(--forest)}
+.prod p{color:var(--cream-ink);margin-top:6px;max-width:58ch}
+.feat{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding:0;list-style:none}
+.feat li{font-size:.8rem;font-weight:600;padding:4px 12px;border-radius:999px;background:var(--sand);color:var(--forest)}
+.swatch{display:flex;gap:6px;margin-top:14px}
+.swatch i{width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--sand-2)}
+@media (max-width:860px){.prod{grid-template-columns:1fr;gap:14px}}
 
-section{padding-block:88px}
-.sec-head{display:flex;flex-direction:column;gap:14px;margin-bottom:44px}
+/* Cómo funciona */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;list-style:none;padding:0;margin:0;counter-reset:s}
+.steps li{border:1px solid rgba(242,230,214,.15);border-radius:var(--r-lg);padding:28px;counter-increment:s;transition:background .3s,border-color .3s}
+.steps li:hover{background:var(--forest-3);border-color:var(--gold)}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--gold);color:var(--forest-2);font-family:var(--f-display);font-weight:800;font-size:1.2rem;margin-bottom:18px}
+.steps h3{font-size:1.35rem}
+.steps p{color:rgba(242,230,214,.75);margin-top:8px}
+@media (max-width:860px){.steps{grid-template-columns:1fr}}
 
-/* puestos */
-.puesto{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;padding-block:44px;border-top:1px solid var(--line)}
-.puesto:first-of-type{border-top:0}
-.puesto > *{min-width:0}
-.puesto .txt{display:flex;flex-direction:column;gap:16px}
-.puesto .role{font-family:var(--f-mono);font-size:.8rem;color:var(--accent);letter-spacing:.1em;text-transform:uppercase}
-.puesto ul.feat{margin:0;padding:0;list-style:none;display:grid;gap:8px}
-.puesto ul.feat li{padding-left:22px;position:relative}
-.puesto ul.feat li::before{content:"";position:absolute;left:0;top:.62em;width:10px;height:2px;background:var(--accent)}
-.puesto.rev .txt{order:2}
-@media (max-width:860px){.puesto{grid-template-columns:1fr;gap:28px}.puesto.rev .txt{order:0}}
-.demo{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;position:relative}
-.demo .label{position:absolute;top:-11px;left:16px;background:var(--bg);font-family:var(--f-mono);font-size:.72rem;padding:0 8px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+/* Beneficios */
+.benefits{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.benefit{background:#FBF5EC;border:1px solid var(--sand-2);border-radius:var(--r);padding:22px}
+.benefit h3{font-size:1.15rem;color:var(--forest)}
+.benefit p{color:var(--cream-ink);margin-top:6px;font-size:.95rem}
 
-/* phone menu */
-.phone{max-width:290px;margin:0 auto;border:9px solid var(--ink);border-radius:30px;background:var(--ticket);padding:16px 14px 20px;min-height:430px}
-.phone .ph-top{text-align:center;font-family:var(--f-display);font-weight:800;font-size:1.4rem;text-transform:uppercase;margin-bottom:10px}
-.tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto}
-.tabs button{font:inherit;font-size:.8rem;font-weight:600;border:1px solid var(--line);background:transparent;color:var(--ink);padding:5px 10px;border-radius:99px;cursor:pointer;white-space:nowrap}
-.tabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.dishes{list-style:none;margin:0;padding:0;display:grid;gap:12px}
-.dishes li{display:grid;grid-template-columns:1fr auto;gap:2px 10px;border-bottom:1px dotted var(--line);padding-bottom:10px}
-.dishes b{font-size:.92rem}
-.dishes small{grid-column:1;color:var(--muted);font-size:.78rem;line-height:1.35}
-.dishes .pr{grid-row:1;grid-column:2;font-family:var(--f-mono);font-size:.85rem;font-variant-numeric:tabular-nums}
-
-/* tables */
-.tbl{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:.86rem;font-variant-numeric:tabular-nums}
-th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
-th{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
-.pill{font-size:.74rem;font-weight:700;padding:2px 8px;border-radius:99px}
-.pill.ok{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
-.pill.late{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
-.pill.ext{background:color-mix(in srgb,var(--flag) 32%,transparent);color:var(--ink)}
-.grid-h td.s{text-align:center;font-family:var(--f-mono);font-size:.78rem}
-.sh{display:inline-block;min-width:34px;padding:3px 4px;border-radius:4px}
-.sh.m{background:color-mix(in srgb,var(--accent) 20%,transparent)}
-.sh.t{background:color-mix(in srgb,var(--flag) 35%,transparent)}
-.sh.l{color:var(--muted)}
-.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:.78rem;color:var(--muted)}
-
-/* origen */
-.origen{background:var(--ink);color:var(--bg);border-radius:14px;padding:56px clamp(20px,5vw,64px);display:grid;grid-template-columns:1fr 1fr;gap:40px}
-.origen > *{min-width:0}
-.origen .eyebrow{color:color-mix(in srgb,var(--bg) 65%,transparent)}
-.origen p{color:color-mix(in srgb,var(--bg) 80%,transparent)}
-.origen ol{margin:0;padding:0;list-style:none;display:grid;gap:18px;counter-reset:s}
-.origen li{counter-increment:s;display:grid;grid-template-columns:44px 1fr;gap:12px}
-.origen li::before{content:counter(s);font-family:var(--f-display);font-weight:900;font-size:2.2rem;line-height:1;color:var(--flag)}
-@media (max-width:860px){.origen{grid-template-columns:1fr}}
-
-/* planes */
-.planes{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-@media (max-width:900px){.planes{grid-template-columns:1fr}}
-.plan{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:26px;display:flex;flex-direction:column;gap:14px}
-.plan.dest{border:2px solid var(--accent)}
-.plan .price{font-family:var(--f-display);font-weight:800;font-size:2.2rem;line-height:1}
-.plan .price small{font-family:var(--f-body);font-size:.85rem;font-weight:500;color:var(--muted)}
-.plan ul{margin:0;padding-left:18px;color:var(--muted);display:grid;gap:4px;flex:1}
-
-/* otros */
-.otro{display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px 26px}
-.otro > div{min-width:0}
-.otro .chip{font-family:var(--f-mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;border:1px solid var(--line);padding:4px 10px;border-radius:99px;color:var(--muted)}
-.otro .ico{width:52px;height:52px;border-radius:10px;background:color-mix(in srgb,var(--accent) 14%,transparent);display:grid;place-items:center;font-family:var(--f-display);font-weight:900;font-size:1.6rem;color:var(--accent)}
-@media (max-width:600px){.otro{grid-template-columns:1fr}}
-
-/* contacto */
-.contacto{text-align:left;display:grid;grid-template-columns:1.2fr .8fr;gap:40px;align-items:end}
-.contacto > *{min-width:0}
-.num{font-family:var(--f-mono);font-size:1.25rem;font-weight:600;user-select:all}
-.contact-box{display:flex;flex-direction:column;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:24px}
-.copy{font:inherit;font-size:.85rem;background:transparent;border:1px solid var(--line);color:var(--ink);padding:6px 12px;border-radius:6px;cursor:pointer;align-self:flex-start}
-@media (max-width:860px){.contacto{grid-template-columns:1fr}}
-footer{border-top:1px solid var(--line);padding-block:28px;color:var(--muted);font-size:.85rem}
-footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-/* La Carta demo */
-.phone{display:flex;flex-direction:column;padding-bottom:10px}
-.ph-body{flex:1;min-height:330px;font-size:.88rem}
-.ph-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;border-top:1px solid var(--line);padding-top:8px;margin-top:8px}
-.ph-nav button{font:inherit;font-size:.66rem;font-weight:600;background:transparent;border:0;color:var(--muted);padding:6px 0;border-radius:6px;cursor:pointer}
-.ph-nav button[aria-selected="true"]{color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
-.chips{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto}
-.chips button{font:inherit;font-size:.76rem;font-weight:600;border:1px solid var(--line);background:transparent;color:var(--ink);padding:4px 10px;border-radius:99px;cursor:pointer;white-space:nowrap}
-.chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.ph-body h4{margin:0 0 10px;font-family:var(--f-display);text-transform:uppercase;font-size:1.15rem}
-.hrs{width:100%;font-size:.82rem}
-.hrs td{padding:6px 2px}
-.hrs td:last-child{text-align:right;font-family:var(--f-mono)}
-.open{display:inline-block;margin-bottom:10px}
-.mini-form{display:grid;gap:8px}
-.mini-form label{font-size:.72rem;color:var(--muted);display:grid;gap:2px}
-.mini-form input,.mini-form select{font:inherit;font-size:.85rem;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);width:100%}
-.mini-form .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.mini-form button{font:inherit;font-weight:700;font-size:.85rem;background:var(--accent);color:var(--accent-ink);border:0;border-radius:6px;padding:9px;cursor:pointer}
-.okmsg{font-size:.8rem;color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,transparent);padding:8px;border-radius:6px}
-.map{height:110px;border-radius:8px;margin-bottom:10px;border:1px solid var(--line);
-  background:
-   linear-gradient(90deg,transparent 46%,color-mix(in srgb,var(--muted) 35%,transparent) 46% 50%,transparent 50%),
-   linear-gradient(0deg,transparent 58%,color-mix(in srgb,var(--muted) 35%,transparent) 58% 62%,transparent 62%),
-   linear-gradient(120deg,transparent 30%,color-mix(in srgb,var(--muted) 20%,transparent) 30% 33%,transparent 33%),
-   color-mix(in srgb,var(--accent) 8%,var(--surface));position:relative}
-.map::after{content:"";position:absolute;left:47%;top:38%;width:14px;height:14px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--warn)}
-.kv{display:grid;gap:6px;font-size:.82rem}
-.kv span{color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;font-family:var(--f-mono)}
-.minibtns{display:flex;gap:6px;margin-top:10px}
-.minibtns span{flex:1;text-align:center;font-size:.76rem;font-weight:700;border:1px solid var(--accent);color:var(--accent);border-radius:6px;padding:6px}
-.score{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
-.score b{font-family:var(--f-display);font-size:2.2rem;line-height:1}
-.stars{color:var(--flag);letter-spacing:2px}
-.revw{border-top:1px dotted var(--line);padding-block:8px;font-size:.8rem}
-.revw .who{display:flex;justify-content:space-between;font-weight:600}
-.note{font-size:.68rem;color:var(--muted);margin-top:6px}
-
-/* Portal demo */
-.roles{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.roles button{font:inherit;font-size:.84rem;font-weight:700;border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:7px 12px;border-radius:6px;cursor:pointer}
-.roles button[aria-selected="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
-.portal{display:grid;gap:14px}
-.who-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.82rem;color:var(--muted);flex-wrap:wrap}
-.who-bar strong{color:var(--ink)}
-.mods{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.mod{border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:.84rem;font-weight:600;display:flex;flex-direction:column;gap:2px}
-.mod small{font-weight:400;color:var(--muted);font-size:.74rem}
-.mod.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,transparent)}
-@media (max-width:420px){.mods{grid-template-columns:1fr}}
-.panel-t{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.mark{display:flex;gap:12px;align-items:center;border:1px dashed var(--line);border-radius:8px;padding:12px}
-.qr{width:64px;height:64px;flex:none;background:
-  repeating-linear-gradient(90deg,var(--ink) 0 6px,transparent 6px 10px),
-  repeating-linear-gradient(0deg,var(--ink) 0 6px,transparent 6px 12px);
-  -webkit-mask:linear-gradient(#000 0 0);border-radius:4px;opacity:.85}
-.btn.live{align-self:flex-start}
-[hidden]{display:none!important}
-.matrix{margin-top:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+/* CTA final */
+.final{background:var(--gold);color:var(--forest-2);border-radius:var(--r-lg);padding:56px max(24px,5vw);display:grid;grid-template-columns:1.3fr 1fr;gap:32px;align-items:center}
+.final h2{font-size:clamp(2rem,5vw,3.2rem)}
+.final p{margin-top:12px;font-size:1.08rem;max-width:46ch}
+.contact{background:var(--forest);color:var(--sand);border-radius:var(--r);padding:22px;display:grid;gap:10px}
+.contact .mail{font-family:var(--f-display);font-size:1.2rem;font-weight:700;user-select:all;word-break:break-all}
+@media (max-width:800px){.final{grid-template-columns:1fr}}
+/* Preguntas frecuentes */
+.faq{display:grid;gap:12px;max-width:860px}
+.faq details{background:#FBF5EC;border:1px solid var(--sand-2);border-radius:var(--r);transition:background .3s,border-color .3s}
+.faq details[open]{border-color:var(--forest-3);background:#fff}
+.faq summary{list-style:none;cursor:pointer;padding:18px 22px;font-family:var(--f-display);font-weight:700;font-size:1.12rem;color:var(--forest);display:flex;justify-content:space-between;gap:16px;align-items:center}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--sand);color:var(--forest);font-size:1.2rem;transition:transform .35s,background .3s}
+.faq details[open] summary::after{transform:rotate(45deg);background:var(--gold)}
+.faq details p{padding:0 22px 20px;color:var(--cream-ink);max-width:70ch;animation:fade .35s ease both}
+@keyframes fade{from{transform:translateY(-6px)}to{transform:none}}
+.contact-row{display:grid;gap:4px;padding:12px 0;border-bottom:1px solid rgba(242,230,214,.15)}
+.contact-row:last-of-type{border-bottom:0}
+.contact-row .lbl{font-size:.8rem;opacity:.7}
+.contact-row .val{font-family:var(--f-display);font-size:1.15rem;font-weight:700;user-select:all;word-break:break-all}
+.contact .acts{display:flex;flex-wrap:wrap;gap:8px}
+.contact .acts .btn{padding:9px 16px;font-size:.9rem}
+.btn-wa{background:#25D366;color:#073B1E}
+footer{padding-block:36px;color:rgba(242,230,214,.6);font-size:.9rem}
+footer .in{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px}
+.reveal{animation:rise linear both;animation-timeline:view();animation-range:entry 0% entry 35%}
+@supports not (animation-timeline:view()){.reveal{animation:none}}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,160%);background:var(--sand);color:var(--forest);padding:12px 20px;border-radius:999px;font-weight:700;z-index:60;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.toast.show{transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="wrap">
-    <a class="logo" href="#inicio" aria-label="Brigada, inicio">
-      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="4" width="26" height="4" rx="1" fill="currentColor"/><path d="M8 10h4v14l-2 3-2-3z" fill="var(--accent)"/><path d="M14 10h4v14l-2 3-2-3z" fill="currentColor"/><path d="M20 10h4v14l-2 3-2-3z" fill="var(--flag)"/></svg>
-      Brigada
-    </a>
-    <div class="navlinks">
-      <a href="#puestos">Productos</a>
-      <a href="#origen">Cómo nació</a>
-      <a href="#planes">Planes</a>
-      <a class="btn" href="#contacto">Hablemos</a>
+<header class="nav"><div class="in">
+  <a class="logo" href="#top" aria-label="Brigada, inicio">
+    <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="10" fill="#F4B13B"/><path d="M9 23h16M11 23c0-5 2.7-9 6-9s6 4 6 9" stroke="#0F3D3A" stroke-width="2.6" fill="none" stroke-linecap="round"/><circle cx="17" cy="11" r="1.8" fill="#0F3D3A"/></svg>
+    Brigada</a>
+  <nav aria-label="Secciones"><a href="#productos">Productos</a><a href="#como">Cómo funciona</a><a href="#beneficios">Beneficios</a><a href="#preguntas">Preguntas</a></nav>
+  <a class="btn btn-gold" href="#contacto">Pide una demo</a>
+</div></header>
+
+<section class="hero" id="top"><div class="in">
+  <div class="copy">
+    <div class="eyebrow">Herramientas digitales para restaurantes</div>
+    <h1>Tu restaurant, <em>ordenado</em> como una buena cocina.</h1>
+    <p class="lead">Brigada reúne la carta digital, el portal de tu equipo y la planificación de turnos en un solo lugar. Menos planillas sueltas, menos cálculos a fin de mes.</p>
+    <div class="cta"><a class="btn btn-gold" href="#productos">Ver los productos</a><a class="btn btn-line" href="carta.html">Probar La Carta</a></div>
+    <p class="def"><b>brigada</b> <span><i>s. f.</i> Equipo de cocina en el que cada puesto sabe qué hacer, cuándo y con quién.</span></p>
+  </div>
+  <div class="stack" aria-label="Vista previa de los productos">
+    <a class="scr s-carta" href="carta.html" aria-label="Abrir La Carta">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <div class="body"><span class="t">Casa Brasa</span>
+        <div class="dish"><span>Lomo vetado 350 g</span><b>$18.900</b></div>
+        <div class="dish"><span>Pisco sour Brasa</span><b>$5.900</b></div>
+        <div class="dish"><span>Reserva · 2 pers · 20:30</span><b>✓</b></div></div></a>
+    <a class="scr s-trab" href="trabajadores.html" aria-label="Abrir Portal de trabajadores">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <div class="body"><b style="font-family:var(--f-display)">Portal de trabajadores</b>
+        <div class="kp"><div>Trabajan hoy<b>6</b></div><div>Tareas<b>9/12</b></div></div>
+        <div class="row"><span>Martina · Bartender</span><span>16:00–01:00</span></div>
+        <div class="row"><span>Tomás · Cocinero</span><span>11:00–20:00</span></div></div></a>
+    <a class="scr s-hor" href="horarios.html" aria-label="Abrir Horarios">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <div class="body"><b style="font-family:var(--f-display);text-transform:uppercase">Horarios</b>
+        <div class="g"><span class="n"></span><span class="h">Lu</span><span class="h">Ma</span><span class="h">Mi</span><span class="h">Ju</span><span class="h">Vi</span>
+          <span class="n">Valentina</span><span>12–21</span><span class="l"></span><span>12–21</span><span>12–21</span><span>12–21</span>
+          <span class="n">Ignacio</span><span class="l"></span><span class="l"></span><span>18–00</span><span>18–00</span><span>18–00</span>
+          <span class="n">Josefa</span><span>12–21</span><span>12–21</span><span class="l"></span><span>12–21</span><span>12–21</span>
+          <span class="n">Diego</span><span class="l"></span><span class="l"></span><span>18–00</span><span>18–00</span><span>18–00</span></div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:.7rem;display:flex;justify-content:space-between;border-top:2px solid #0A0A0A;padding-top:6px"><span>Cierre octubre</span><span>FT 22 días · PT 96 h</span></div></div></a>
+  </div>
+</div></section>
+
+<section class="band sand" id="productos"><div class="in">
+  <div class="head reveal"><div><div class="eyebrow">Tres puestos, una brigada</div><h2>Lo que tu restaurant necesita para funcionar cada día</h2></div>
+    <p>Cada producto funciona por separado y comparten la misma información de tu equipo. Partes con uno y sumas los otros cuando los necesites.</p></div>
+  <div class="products">
+    <article class="prod reveal">
+      <div class="role">Maître<small>Atiende a tus clientes</small></div>
+      <div><h3>La Carta</h3><p>Tu carta digital con QR: menú, tragos y bebestibles, promociones del día, reseñas de clientes, reservas y la historia de tu local. Elige entre pizarra de bistró, tarjetas ilustradas o carta clásica, o la adaptamos a la identidad de tu local.</p>
+        <ul class="feat"><li>3 estilos de carta o uno a medida</li><li>Menú por categorías</li><li>Tragos</li><li>Reservas</li><li>Reseñas</li><li>Promociones</li><li>Historia</li></ul>
+        <div class="swatch" aria-label="Colores cálidos"><i style="background:#D9542B"></i><i style="background:#E9A23B"></i><i style="background:#7A2131"></i><i style="background:#FFF4E6"></i></div></div>
+      <a class="btn btn-forest" href="carta.html">Ver demo</a>
+    </article>
+    <article class="prod reveal">
+      <div class="role">Chef de cocina<small>Organiza al equipo</small></div>
+      <div><h3>Portal de trabajadores</h3><p>Sesiones separadas para administrador, supervisor y trabajadores. Cada uno ve lo que le corresponde: cargos, tipo de contrato, horario de cada persona y tareas a cumplir.</p>
+        <ul class="feat"><li>3 tipos de sesión</li><li>Cargos</li><li>Full time / part time</li><li>Horario semanal</li><li>Tareas con verificación</li></ul>
+        <div class="swatch" aria-label="Colores azules"><i style="background:#0C2D5E"></i><i style="background:#1F5FD6"></i><i style="background:#7FAAF5"></i><i style="background:#EDF3FC"></i></div></div>
+      <a class="btn btn-forest" href="trabajadores.html">Ver demo</a>
+    </article>
+    <article class="prod reveal">
+      <div class="role">Sous-chef<small>Supervisa el turno</small></div>
+      <div><h3>Horarios</h3><p>Crea el horario del mes tocando celdas, controla las horas semanales, registra anticipos con tope por contrato, lleva las vacaciones disponibles y obtén los días u horas trabajadas para el cierre.</p>
+        <ul class="feat"><li>Creación de horarios</li><li>Horario semanal</li><li>Anticipos</li><li>Vacaciones disponibles</li><li>Días / horas trabajadas</li><li>Exporta a Excel</li></ul>
+        <div class="swatch" aria-label="Blanco y negro"><i style="background:#0A0A0A"></i><i style="background:#5E5E5E"></i><i style="background:#D6D6D6"></i><i style="background:#FFFFFF"></i></div></div>
+      <a class="btn btn-forest" href="horarios.html">Ver demo</a>
+    </article>
+  </div>
+</div></section>
+
+<section class="band" id="como"><div class="in">
+  <div class="head reveal"><div><div class="eyebrow">Cómo funciona</div><h2>De la conversación a tu local funcionando</h2></div>
+    <p style="color:rgba(242,230,214,.75)">Te acompañamos en la puesta en marcha para que tu equipo lo use desde la primera semana.</p></div>
+  <ol class="steps">
+    <li class="reveal"><h3>Conversamos</h3><p>Nos cuentas cómo trabaja tu local: turnos, cargos, contratos y lo que hoy haces en planillas.</p></li>
+    <li class="reveal"><h3>Configuramos</h3><p>Cargamos tu carta, tu equipo y tus reglas: metas de horas, topes de anticipo y turnos habituales.</p></li>
+    <li class="reveal"><h3>Tu equipo lo usa</h3><p>Publicamos tu carta con QR y entregamos los accesos a administrador, supervisor y trabajadores.</p></li>
+  </ol>
+</div></section>
+
+<section class="band sand" id="beneficios"><div class="in">
+  <div class="head reveal"><div><div class="eyebrow">Por qué Brigada</div><h2>Hecho por alguien que arma horarios todos los meses</h2></div>
+    <p>Brigada nace dentro de un restaurant real, resolviendo los problemas de cada cierre de mes.</p></div>
+  <div class="benefits">
+    <div class="benefit reveal"><h3>Cierre de mes sin calculadora</h3><p>Días trabajados para full time, horas para part time, licencias, permisos y vacaciones en una sola tabla.</p></div>
+    <div class="benefit reveal"><h3>Reglas de tu local</h3><p>Meta de 44,5 a 45 horas para full time, máximo 30 para part time y tope de anticipos por contrato.</p></div>
+    <div class="benefit reveal"><h3>Cada uno ve lo suyo</h3><p>El trabajador ve su turno y sus tareas. El supervisor, el equipo. El administrador, todo.</p></div>
+    <div class="benefit reveal"><h3>Funciona en el celular</h3><p>Todas las pantallas se adaptan al teléfono, para revisar el turno desde cualquier lugar.</p></div>
+    <div class="benefit reveal"><h3>A tu medida</h3><p>Cada producto tiene su menú de ajustes: nombre del local, tema claro u oscuro, tamaño de texto y más.</p></div>
+    <div class="benefit reveal"><h3>Exporta a Excel</h3><p>Copia o descarga el cierre y los anticipos para enviarlos a tu contador.</p></div>
+  </div>
+</div></section>
+
+<section class="band sand" id="preguntas"><div class="in">
+  <div class="head reveal"><div><div class="eyebrow">Preguntas frecuentes</div><h2>Lo que suelen preguntarnos</h2></div>
+    <p>Si tu duda no está aquí, escríbenos por WhatsApp y te respondemos.</p></div>
+  <div class="faq">
+    <details open><summary>¿Necesito instalar algo?</summary><p>No. Todo funciona desde el navegador del celular, tablet o computador. Si quieres, se puede agregar a la pantalla de inicio del celular como si fuera una app.</p></details>
+    <details><summary>¿Puedo usar solo uno de los productos?</summary><p>Sí. Puedes partir solo con La Carta, solo con el Portal o solo con Horarios, y sumar los demás cuando los necesites. Comparten la misma información de tu equipo.</p></details>
+    <details><summary>¿Sirve si tengo más de un local?</summary><p>Sí. Cada local puede tener su propia carta con su propio código QR, y el equipo y los horarios se organizan por local.</p></details>
+    <details><summary>¿Puedo cambiar el diseño de la carta?</summary><p>Puedes elegir entre tres estilos listos (pizarra, ilustrada o clásica) o pedir uno adaptado a los colores y la identidad de tu local. Los platos, precios y promociones los actualizas cuando quieras.</p></details>
+    <details><summary>¿Dónde quedan guardados los datos?</summary><p>En la demo, los datos quedan solo en tu navegador. En la versión para tu local, se guardan en una base de datos compartida, para que el administrador, los supervisores y los trabajadores vean la misma información desde sus propios equipos.</p></details>
+    <details><summary>¿Cómo se calculan las horas, vacaciones y anticipos?</summary><p>Con las reglas de tu local: meta de horas para full time, máximo para part time, tope de anticipo por tipo de contrato y 15 días hábiles de vacaciones al año. Todo se puede ajustar y exportar a Excel para tu contador.</p></details>
+    <details><summary>¿Cuánto cuesta?</summary><p>Depende de cuántos productos uses y del tamaño de tu equipo. Escríbenos y te enviamos una cotización para tu local.</p></details>
+  </div>
+</div></section>
+
+<section class="band" id="contacto"><div class="in">
+  <div class="final reveal">
+    <div><h2>Arma tu brigada digital</h2><p>Escríbenos y te mostramos los tres productos funcionando con los datos de tu local.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:24px"><a class="btn btn-forest" href="carta.html">La Carta</a><a class="btn btn-forest" href="trabajadores.html">Portal</a><a class="btn btn-forest" href="horarios.html">Horarios</a></div></div>
+    <div class="contact">
+      <div class="contact-row"><span class="lbl">WhatsApp</span><span class="val" id="wa">+56 9 6524 8026</span></div>
+      <div class="acts"><a class="btn btn-wa" href="https://wa.me/56965248026?text=Hola%2C%20quiero%20saber%20m%C3%A1s%20sobre%20Brigada" target="_blank" rel="noopener">Escribir por WhatsApp</a><button class="btn btn-line" data-copy="wa">Copiar número</button></div>
+      <div class="contact-row"><span class="lbl">Correo</span><span class="val" id="mail">gen.rodoureira@gmail.com</span></div>
+      <div class="acts"><button class="btn btn-gold" data-copy="mail">Copiar correo</button></div>
     </div>
   </div>
-</nav>
+</div></section>
 
-<main id="inicio">
-  <div class="wrap hero">
-    <div>
-      <span class="eyebrow">Herramientas digitales para restaurantes</span>
-      <h1>Cada uno en su puesto. <em>Cada turno cubierto.</em></h1>
-      <p class="lead">En una cocina, la brigada funciona porque todos saben su rol y su horario. Brigada hace lo mismo en tu restaurant: una carta digital para tus clientes y un portal para tu equipo, sin planillas a mano ni cálculos a fin de mes.</p>
-      <div class="ctas">
-        <a class="btn" href="#contacto">Pide una demo por WhatsApp</a>
-        <a class="btn ghost" href="#puestos">Ver productos</a>
-      </div>
-    </div>
-    <div class="rail" aria-label="Ejemplo de resumen de turno">
-      <div class="ticket">
-        <div class="t-head"><span>TURNO · SÁB 18:00</span><span>#0142</span></div>
-        <ul>
-          <li><span>Chef ........ Marcela <span class="tag ok">a tiempo</span></span><span>17:52</span></li>
-          <li><span>Sous chef ... Javier <span class="tag late">+12 min</span></span><span>18:12</span></li>
-          <li><span>Barra ....... Camila <span class="tag ok">a tiempo</span></span><span>17:58</span></li>
-          <li><span>Garzón ...... Diego <span class="tag ext">reemplazo</span></span><span>18:00</span></li>
-          <li><span>Caja ........ Rocío <span class="tag ok">a tiempo</span></span><span>17:55</span></li>
-        </ul>
-        <div class="t-foot"><span>H. EXTRA SEMANA</span><span>6 h 40 min</span></div>
-        <div class="stamp">CUBIERTO</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="strip"><div class="wrap">
-    <span>Menú y reservas</span><span>Horario del personal</span><span>Asistencia y anticipos</span><span>Hecho en Chile</span>
-  </div></div>
-
-  <section id="puestos">
-    <div class="wrap">
-      <div class="sec-head">
-        <span class="eyebrow">La brigada</span>
-        <h2>Dos productos: uno para tus clientes, otro para tu equipo</h2>
-        <p class="lead">La Carta es la cara de tu local hacia afuera. El Portal ordena todo lo de adentro: turnos, asistencia, anticipos y el cierre de mes.</p>
-      </div>
-
-      <article class="puesto">
-        <div class="txt">
-          <span class="role">Producto 1 · Para tus clientes</span>
-          <h3>La Carta</h3>
-          <p>Todo lo que un cliente busca antes de ir, en un solo link y un QR en cada mesa. Cambias un precio o un horario y se actualiza al tiro.</p>
-          <ul class="feat">
-            <li><strong>Menú</strong> por categorías, con platos agotados que se ocultan en segundos</li>
-            <li><strong>Horarios</strong> de atención con aviso de abierto o cerrado</li>
-            <li><strong>Reservas</strong> que llegan directo al local</li>
-            <li><strong>Contacto y dirección</strong> con botón para llegar en Maps o Waze</li>
-            <li><strong>Reseñas</strong> de tus clientes y link para dejar una nueva</li>
-          </ul>
-          <a class="btn live" href="carta/index.html">Abrir La Carta</a>
-        </div>
-        <div class="demo">
-          <span class="label">Demo · tócala</span>
-          <div class="phone">
-            <div class="ph-top">Tu Restaurant</div>
-            <div class="ph-body" id="ph-body" aria-live="polite"></div>
-            <div class="ph-nav" role="tablist" aria-label="Secciones de La Carta">
-              <button role="tab" id="c-menu" aria-selected="true" data-v="menu">Menú</button>
-              <button role="tab" id="c-hor" aria-selected="false" data-v="hor">Horario</button>
-              <button role="tab" id="c-res" aria-selected="false" data-v="res">Reservar</button>
-              <button role="tab" id="c-dir" aria-selected="false" data-v="dir">Ubicación</button>
-              <button role="tab" id="c-rev" aria-selected="false" data-v="rev">Reseñas</button>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <article class="puesto rev">
-        <div class="txt">
-          <span class="role">Producto 2 · Para tu equipo</span>
-          <h3>Portal de trabajadores</h3>
-          <p>Cada persona entra con su propia sesión y ve solo lo que le corresponde. El administrador maneja todo, el supervisor el día a día y cada trabajador lo suyo.</p>
-          <ul class="feat">
-            <li><strong>Horario mensual</strong> rotativo con horas semanales por trabajador</li>
-            <li><strong>Asistencia</strong> con QR y PIN personal: atrasos, horas extra y reemplazos</li>
-            <li><strong>Anticipos y consumo</strong> del personal, con topes y autorizaciones</li>
-            <li><strong>Cierre de mes</strong> listo para remuneraciones</li>
-          </ul>
-          <a class="btn live" href="portal/index.html">Abrir el portal</a>
-        </div>
-        <div class="demo">
-          <span class="label">Demo · cambia de sesión</span>
-          <div class="roles" role="tablist" aria-label="Sesiones del portal">
-            <button role="tab" id="r-admin" aria-selected="true" data-r="admin">Administrador</button>
-            <button role="tab" id="r-sup" aria-selected="false" data-r="sup">Supervisor</button>
-            <button role="tab" id="r-trab" aria-selected="false" data-r="trab">Trabajador</button>
-          </div>
-          <div class="portal" id="portal" aria-live="polite"></div>
-        </div>
-      </article>
-
-      <div class="matrix">
-        <div class="tbl">
-          <table>
-            <thead><tr><th>Módulo</th><th>Administrador</th><th>Supervisor</th><th>Trabajador</th></tr></thead>
-            <tbody>
-              <tr><td>Horario mensual</td><td><span class="pill ok">Crea y edita</span></td><td><span class="pill ok">Edita turnos</span></td><td>Ve el suyo</td></tr>
-              <tr><td>Asistencia y horas extra</td><td><span class="pill ok">Todo</span></td><td><span class="pill ok">Revisa y aprueba</span></td><td>Marca y justifica</td></tr>
-              <tr><td>Anticipos</td><td><span class="pill ok">Todo</span></td><td><span class="pill ok">Registra y autoriza</span></td><td>Ve los suyos</td></tr>
-              <tr><td>Consumo del personal</td><td><span class="pill ok">Todo</span></td><td><span class="pill ok">Registra</span></td><td>Ve los suyos</td></tr>
-              <tr><td>Cierre de mes</td><td><span class="pill ok">Genera</span></td><td><span class="pill ok">Ve (solo lectura)</span></td><td>—</td></tr>
-              <tr><td>Trabajadores, PIN y locales</td><td><span class="pill ok">Gestiona</span></td><td>—</td><td>—</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="origen" style="padding-top:0">
-    <div class="wrap">
-      <div class="origen">
-        <div style="display:flex;flex-direction:column;gap:16px">
-          <span class="eyebrow">Cómo nació</span>
-          <h2>Hecho dentro de una cocina, no en una oficina</h2>
-          <p>Brigada nació resolviendo problemas reales de un restaurant con varios locales: la carta que había que reimprimir cada vez que cambiaba un precio, las horas extra calculadas a mano, los anticipos anotados en un cuaderno y el horario del mes armado a última hora. Hoy esas herramientas se usan en el día a día del servicio.</p>
-        </div>
-        <ol>
-          <li><div><strong>Conversamos 20 minutos.</strong><p>Me cuentas cómo funciona tu local hoy.</p></div></li>
-          <li><div><strong>Lo configuro con tus datos.</strong><p>Tu carta, tus trabajadores, tus turnos y tus reglas de anticipos.</p></div></li>
-          <li><div><strong>Te acompaño el primer mes.</strong><p>Ajustamos lo que haga falta mientras tu equipo se acostumbra.</p></div></li>
-        </ol>
-      </div>
-    </div>
-  </section>
-
-  <section id="planes" style="padding-top:0">
-    <div class="wrap">
-      <div class="sec-head">
-        <span class="eyebrow">Planes</span>
-        <h2>Parte con uno, suma el otro cuando quieras</h2>
-      </div>
-      <div class="planes">
-        <div class="plan">
-          <span class="eyebrow">La Carta</span>
-          <div class="price">$ —<small> / mes</small></div>
-          <ul><li>Menú, horarios, reservas, ubicación y reseñas</li><li>QR para mesas</li><li>Cambios de precios y platos incluidos</li></ul>
-          <a class="btn ghost" href="#contacto">Consultar</a>
-        </div>
-        <div class="plan dest">
-          <span class="eyebrow">Brigada completa</span>
-          <div class="price">$ —<small> / mes</small></div>
-          <ul><li>La Carta + Portal de trabajadores</li><li>Hasta 3 locales</li><li>Soporte por WhatsApp</li></ul>
-          <a class="btn" href="#contacto">Pedir demo</a>
-        </div>
-        <div class="plan">
-          <span class="eyebrow">Portal de trabajadores</span>
-          <div class="price">$ —<small> / mes</small></div>
-          <ul><li>Sesiones de administrador, supervisor y trabajador</li><li>Horario, asistencia, anticipos y consumo</li><li>Cierre de mes</li></ul>
-          <a class="btn ghost" href="#contacto">Consultar</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  
-<section id="contacto" style="padding-top:0">
-    <div class="wrap contacto">
-      <div style="display:flex;flex-direction:column;gap:16px">
-        <span class="eyebrow">Contacto</span>
-        <h2>¿Tu local necesita una brigada?</h2>
-        <p class="lead">Escríbeme por WhatsApp y te muestro una demo con la carta de tu restaurant.</p>
-      </div>
-      <div class="contact-box">
-        <span class="eyebrow">WhatsApp</span>
-        <span class="num" id="num">+56 9 0000 0000</span>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <a class="btn" href="https://wa.me/56900000000?text=Hola%2C%20quiero%20una%20demo%20de%20Brigada" target="_blank" rel="noopener">Abrir WhatsApp</a>
-          <button class="copy" id="copy" type="button">Copiar número</button>
-        </div>
-      </div>
-    </div>
-  </section>
-</main>
-
-<footer><div class="wrap"><span>Brigada · Herramientas para restaurantes</span><span>Santiago, Chile</span></div></footer>
-
+<footer><div class="in"><span>© 2026 Brigada · Herramientas digitales para restaurantes</span><span>Hecho en Chile</span></div></footer>
+<div class="toast" id="toast" role="status"></div>
 <script>
-(function(){
-  /* ---------- La Carta ---------- */
-  var menu={
-    Entradas:[["Empanaditas de queso","Seis unidades, con pebre","$5.900"],["Ceviche mixto","Reineta y camarón","$8.900"],["Machas a la parmesana","Seis unidades","$9.500"]],
-    Fondos:[["Lomo a lo pobre","Papas fritas, cebolla y huevo","$13.900"],["Salmón grillado","Puré rústico y ensalada","$12.500"],["Pastel de choclo","Receta de la casa","$9.900"]],
-    Bebidas:[["Pisco sour","Clásico chileno","$4.500"],["Jugo natural","Frambuesa, mango o piña","$3.200"],["Café de grano","Espresso o americano","$2.500"]]
-  };
-  var cat="Entradas", body=document.getElementById('ph-body');
-  function vMenu(){
-    return '<div class="chips">'+Object.keys(menu).map(function(k){return '<button type="button" data-cat="'+k+'" aria-pressed="'+(k===cat)+'">'+k+'</button>';}).join('')+'</div>'+
-      '<ul class="dishes">'+menu[cat].map(function(d){return '<li><b>'+d[0]+'</b><span class="pr">'+d[2]+'</span><small>'+d[1]+'</small></li>';}).join('')+'</ul>';
-  }
-  function vHor(){
-    var h=[["Lunes","12:30 – 23:00"],["Martes","12:30 – 23:00"],["Miércoles","12:30 – 23:00"],["Jueves","12:30 – 00:00"],["Viernes","12:30 – 02:00"],["Sábado","13:00 – 02:00"],["Domingo","13:00 – 18:00"]];
-    return '<h4>Horario de atención</h4><span class="pill ok open">Abierto ahora</span><table class="hrs"><tbody>'+h.map(function(r){return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>';}).join('')+'</tbody></table>';
-  }
-  function vRes(){
-    return '<h4>Reservar mesa</h4><form class="mini-form" id="resf">'+
-      '<div class="row2"><label for="r-fecha">Fecha<input id="r-fecha" type="date" value="2026-10-31"></label><label for="r-hora">Hora<select id="r-hora"><option>20:00</option><option>20:30</option><option>21:00</option></select></label></div>'+
-      '<div class="row2"><label for="r-pers">Personas<select id="r-pers"><option>2</option><option selected>4</option><option>6</option></select></label><label for="r-nom">Nombre<input id="r-nom" value="Ejemplo"></label></div>'+
-      '<label for="r-tel">Teléfono<input id="r-tel" value="+56 9 1234 5678"></label>'+
-      '<button type="submit">Solicitar reserva</button><div id="resmsg" hidden class="okmsg">Así le llega la solicitud al local: '+
-      '4 personas, sáb 31 oct, 20:00. El local la confirma por WhatsApp.</div></form>';
-  }
-  function vDir(){
-    return '<h4>Cómo llegar</h4><div class="map" role="img" aria-label="Mapa de ejemplo"></div>'+
-      '<div class="kv"><div><span>Dirección</span><br>Av. Ejemplo 1234, Providencia</div><div><span>Teléfono</span><br>+56 2 2000 0000</div><div><span>Instagram</span><br>@turestaurant</div></div>'+
-      '<div class="minibtns"><span>Maps</span><span>Waze</span><span>WhatsApp</span></div>';
-  }
-  function vRev(){
-    var r=[["Cliente 1","★★★★★","Muy buena atención y el pisco sour, excelente."],["Cliente 2","★★★★☆","Rico todo. El sábado conviene reservar."]];
-    return '<h4>Reseñas</h4><div class="score"><b>4,6</b><span class="stars">★★★★★</span></div>'+
-      r.map(function(x){return '<div class="revw"><div class="who"><span>'+x[0]+'</span><span class="stars">'+x[1]+'</span></div>'+x[2]+'</div>';}).join('')+
-      '<div class="minibtns"><span>Dejar una reseña</span></div><p class="note">Reseñas de ejemplo. En tu carta se muestran las de tus clientes.</p>';
-  }
-  var views={menu:vMenu,hor:vHor,res:vRes,dir:vDir,rev:vRev}, cur='menu';
-  function draw(){
-    body.innerHTML=views[cur]();
-    if(cur==='menu') body.querySelectorAll('.chips button').forEach(function(b){b.onclick=function(){cat=b.dataset.cat;draw();};});
-    if(cur==='res') document.getElementById('resf').addEventListener('submit',function(e){e.preventDefault();document.getElementById('resmsg').hidden=false;});
-  }
-  document.querySelectorAll('.ph-nav button').forEach(function(b){
-    b.addEventListener('click',function(){
-      document.querySelectorAll('.ph-nav button').forEach(function(x){x.setAttribute('aria-selected','false');});
-      b.setAttribute('aria-selected','true');cur=b.dataset.v;draw();
-    });
-  });
-  draw();
-
-  /* ---------- Portal ---------- */
-  var roles={
-    admin:{who:'Sesión: <strong>Administrador</strong> · todos los locales',
-      mods:[["Horario mensual","Crear y editar",1],["Asistencia","Atrasos y horas extra",1],["Anticipos y consumo","Topes y registro",1],["Cierre de mes","Resumen para remuneraciones",1],["Trabajadores","Altas, cargos y PIN",1],["Locales","Configuración",1]],
-      panel:'<div class="panel-t">Cierre de mes · octubre (ejemplo)</div><div class="tbl"><table><thead><tr><th>Trabajador</th><th>Jornada</th><th>Trab.</th><th>H. extra</th><th>Anticipo</th></tr></thead><tbody>'+
-        '<tr><td>Marcela R.</td><td>Full</td><td>26 días</td><td>6,5 h</td><td>$150.000</td></tr>'+
-        '<tr><td>Javier P.</td><td>Part</td><td>112 h</td><td>2 h</td><td>—</td></tr>'+
-        '<tr><td>Camila S.</td><td>Full</td><td>25 días</td><td>4 h</td><td>$200.000</td></tr></tbody></table></div>'},
-    sup:{who:'Sesión: <strong>Supervisor</strong> · Local Centro',
-      mods:[["Horario mensual","Editar turnos y reemplazos",1],["Asistencia","Revisar y aprobar",1],["Anticipos y consumo","Registrar y autorizar",1],["Cierre de mes","Ver (solo lectura)",1],["Trabajadores","Solo administrador",0],["Locales","Solo administrador",0]],
-      panel:'<div class="panel-t">Anticipos del mes (ejemplo)</div><div class="tbl"><table><thead><tr><th>Trabajador</th><th>Cargo</th><th>Monto</th><th>Estado</th></tr></thead><tbody>'+
-        '<tr><td>Marcela R.</td><td>Cocina</td><td>$150.000</td><td><span class="pill ok">Dentro del tope</span></td></tr>'+
-        '<tr><td>Diego M.</td><td>Garzón</td><td>$180.000</td><td><span class="pill ext">Sobre tope · autorizado</span></td></tr>'+
-        '<tr><td>Rocío A.</td><td>Caja</td><td>Consumo $8.720</td><td><span class="pill ok">Con 20% dcto.</span></td></tr></tbody></table></div>'},
-    trab:{who:'Sesión: <strong>Diego M.</strong> · Garzón, part time',
-      mods:[["Marcar entrada/salida","QR del local + PIN",1],["Mi horario","Turnos del mes",1],["Mis horas extra","Justificar",1],["Mis anticipos y consumos","Historial",1]],
-      panel:'<div class="mark"><div class="qr" aria-hidden="true"></div><div><strong>Turno de hoy: 18:00 – 02:00</strong><br><span style="color:var(--muted);font-size:.85rem">Escanea el QR de caja e ingresa tu PIN para marcar.</span></div></div>'+
-        '<div class="panel-t">Mi semana (ejemplo)</div><div class="tbl"><table><tbody><tr><td>Lu</td><td>18:00–02:00</td><td><span class="pill ok">A tiempo</span></td></tr><tr><td>Ma</td><td>Libre</td><td>—</td></tr><tr><td>Mi</td><td>18:00–02:00</td><td><span class="pill ext">+1 h extra · justificada</span></td></tr></tbody></table></div>'}
-  };
-  var portal=document.getElementById('portal');
-  function drawRole(k){
-    var r=roles[k];
-    portal.innerHTML='<div class="who-bar"><span>'+r.who+'</span><span>Ejemplo</span></div>'+
-      '<div class="mods">'+r.mods.map(function(m){return '<div class="mod'+(m[2]?' on':'')+'"'+(m[2]?'':' style="opacity:.5"')+'>'+m[0]+'<small>'+m[1]+'</small></div>';}).join('')+'</div>'+r.panel;
-  }
-  document.querySelectorAll('.roles button').forEach(function(b){
-    b.addEventListener('click',function(){
-      document.querySelectorAll('.roles button').forEach(function(x){x.setAttribute('aria-selected','false');});
-      b.setAttribute('aria-selected','true');drawRole(b.dataset.r);
-    });
-  });
-  drawRole('admin');
-
-  /* ---------- Copiar número ---------- */
-  var c=document.getElementById('copy');
-  c.addEventListener('click',function(){
-    var n=document.getElementById('num');
-    function sel(){var rg=document.createRange();rg.selectNodeContents(n);var s=getSelection();s.removeAllRanges();s.addRange(rg);c.textContent='Número seleccionado';}
-    try{navigator.clipboard.writeText(n.textContent).then(function(){c.textContent='Copiado';},sel);}catch(e){sel();}
-  });
-})();
+function show(m){const e=document.getElementById("toast");e.textContent=m;e.classList.add("show");clearTimeout(show.t);show.t=setTimeout(()=>e.classList.remove("show"),2200)}
+document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=()=>{const el=document.getElementById(b.dataset.copy);const t=el.textContent.trim();
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>show("Copiado: "+t),()=>{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);show("Seleccionado: cópialo con Ctrl+C")})});
 </script>
-
 </body>
 </html>
